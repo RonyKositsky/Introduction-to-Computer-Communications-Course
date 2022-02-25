@@ -1,28 +1,49 @@
 /*!
 ******************************************************************************
-\file SocketTools.h
-\date 24 February 2022
+\file ChannelUtils.h
+\date 25 February 2022
 \author Jonathan Matetzky & Rony Kosistky
 *****************************************************************************/
-#ifndef __SOCKET_TOOLS_H__
-#define __SOCKET_TOOLS_H__
+
+#ifndef __CHANNEL_UTILS_H__
+#define __CHANNEL_UTILS_H__
 
 /************************************
 *      include                      *
 ************************************/
-#include <stdio.h>
 #include <winsock2.h>
+#include "../Utilities/SocketTools.h"
 
 /************************************
 *       types                       *
 ************************************/
 typedef struct
 {
-	SOCKET sock;
-	struct sockaddr_in *addr;
-	char* buf;
-	int buf_size;
-}MessageVars;
+	int port;
+	char* server_ip;
+	int server_port;
+	int prob;
+	int seed;
+}ChannelArguments;
+
+typedef struct
+{
+	int msg_size_from_sender;
+	SOCKET server_sock;
+	SOCKET sender_sock;
+	struct sockaddr_in my_addr;
+	struct sockaddr_in *sender_addr;
+	struct sockaddr_in *server_addr;
+	MessageVars readMsg;
+	MessageVars writeMsg;
+}ChannelParams;
+
+/************************************
+*      variables                    *
+************************************/
+static ChannelParams ChParams_s;
+static ChannelArguments ChArgs_s;
+static char* CHANNEL_REC_BUF;
 
 /************************************
 *       API                         *
@@ -31,41 +52,35 @@ typedef struct
 /*!
 ******************************************************************************
 \brief
-Initializing new socket.
-\return SOCKET.
+Initialize the channel.
+\param
+ [in] argv - arguments from the user.
+\return none
 *****************************************************************************/
-SOCKET SocketTools_CreateSocket();
+void ChannelUtils_ChannelInit(char* argv[]);
 
 /*!
 ******************************************************************************
 \brief
-Creating socket address via reference.
-\param
- [in] sa   - Socket address pointer.
- [in] port - Port number.
- [in] ip   - The ip as string.
-\return none.
+Preparing channel read massage that was sent.
+\return none
 *****************************************************************************/
-void SocketTools_CreateAddress(struct sockaddr_in* sa, int port, char* ip);
+void ChannelUtils_PrepareReadMsg();
 
 /*!
 ******************************************************************************
 \brief
-Reading message via socket.
-\param
- [in] msgVars - The message arguments struct.
-\return the number of bits recieved.
+Preparing channel to writing massage.
+\return none
 *****************************************************************************/
-int SocketTools_ReadMessage(MessageVars* msgVars);
+void ChannelUtils_PrepareWriteMsg();
 
 /*!
 ******************************************************************************
 \brief
-Sending message via socket.
-\param
- [in] msgVars - The message arguments struct.
-\return the number of bits sent.
+Tearing down the channel.
+\return none
 *****************************************************************************/
-int SocketTools_SendMessage(MessageVars* msgVars);
+void ChannelUtils_ChannelTearDown();
 
-#endif //__SOCKET_TOOLS_H__
+#endif //__CHANNEL_UTILS_H__

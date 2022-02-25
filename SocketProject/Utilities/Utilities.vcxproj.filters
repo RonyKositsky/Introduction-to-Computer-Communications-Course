@@ -3,8 +3,10 @@
   <ItemGroup>
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="SocketTools.h" />
+    <ClInclude Include="BitTools.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SocketTools.c" />
+    <ClCompile Include="BitTools.c" />
   </ItemGroup>
 </Project>

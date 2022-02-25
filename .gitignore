@@ -3,7 +3,13 @@
 /SocketProject/Sender/x64/*
 /SocketProject/Server/x64/*
 /SocketProject/Utilities/x64/*
+/SocketProject/x64/*
+/SocketProject/Channel/Debug/*
+/SocketProject/Sender/Debug/*
+/SocketProject/Server/Debug/*
+/SocketProject/Utilities/Debug/*
+/SocketProject/Debug/*
 /SocketProject/Channel/Channel.vcxproj
 /SocketProject/Server/Server.vcxproj
-/SocketProject/Reciever/Reciever.vcxproj
+/SocketProject/Sender/Sender.vcxproj
 /SocketProject/Utilities/Utilities.vcxproj

@@ -1,6 +1,6 @@
 /*!
 ******************************************************************************
-\file SocketTools.h
+\file SocketTools.c
 \date 24 February 2022
 \author Jonathan Matetzky & Rony Kosistky
 ALL RIGHTS RESERVED
@@ -10,11 +10,14 @@ ALL RIGHTS RESERVED
 *      include                      *
 ************************************/
 #include "SocketTools.h"
+#include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/timeb.h>
+#include <winsock2.h>
 #include <conio.h>
+#include <ws2tcpip.h>
 
 /************************************
 *       API implementation          *
@@ -47,6 +50,7 @@ SOCKET SocketTools_CreateSocket()
 	return sockfd;
 }
 
+
 /*!
 ******************************************************************************
 \brief
@@ -61,7 +65,14 @@ void SocketTools_CreateAddress(struct sockaddr_in* sa, int port, char* ip)
 {
 	sa->sin_family = AF_INET;
 	sa->sin_port = port;
-	sa->sin_addr.s_addr = ip == NULL? htonl(INADDR_ANY) : inet_addr(ip);
+	if (ip == NULL)
+	{
+		sa->sin_addr.s_addr = htonl(INADDR_ANY);
+	}  
+	else
+	{
+		InetPton(AF_INET, ip, &sa->sin_addr.s_addr);
+	}
 }
 
 /*!
@@ -72,9 +83,9 @@ Reading message via socket.
  [in] msgVars - The message arguments struct.
 \return the number of bits recieved.
 *****************************************************************************/
-int SocketTools_ReadMessage(MessgeVars* msgVars)
+int SocketTools_ReadMessage(MessageVars* msgVars)
 {
-	int len = sizeof(*msgVars->addr);
+	int len = sizeof(msgVars->addr);
 	WSADATA wsaData;
 	WORD wVersionRequested = MAKEWORD(1, 1);
 	
@@ -104,7 +115,7 @@ Sending message via socket.
  [in] msgVars - The message arguments struct.
 \return the number of bits sent.
 *****************************************************************************/
-int SocketTools_SendMessage(MessgeVars* msgVars)
+int SocketTools_SendMessage(MessageVars* msgVars)
 {
 	WSADATA wsaData;
 	WORD wVersionRequested = MAKEWORD(1, 1);
@@ -125,6 +136,8 @@ int SocketTools_SendMessage(MessgeVars* msgVars)
 	}
 	return size;
 }
+
+
 
 
 

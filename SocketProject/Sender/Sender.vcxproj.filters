@@ -2,5 +2,9 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="Sender.c" />
+    <ClCompile Include="SenderUtils.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SenderUtils.h" />
   </ItemGroup>
 </Project>
