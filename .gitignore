@@ -1,7 +1,9 @@
 /SocketProject/.vs/*
 /SocketProject/Channel/x64/*
 /SocketProject/Sender/x64/*
-/SocketProject/Reciever/x64/*
+/SocketProject/Server/x64/*
+/SocketProject/Utilities/x64/*
 /SocketProject/Channel/Channel.vcxproj
-/SocketProject/Sender/Sender.vcxproj
+/SocketProject/Server/Server.vcxproj
 /SocketProject/Reciever/Reciever.vcxproj
+/SocketProject/Utilities/Utilities.vcxproj

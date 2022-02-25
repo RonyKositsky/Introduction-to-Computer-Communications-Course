@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <windows.h>
 #include <string.h>
-#include <arpa/inet.h>
 #define SIZE 1024
 
 //  TODO: migrate 2 auxilary functions to different modules
@@ -31,7 +30,7 @@ void write_file(int sockfd_s)
     char *filename = "recv.txt";
     char buffer[SIZE];
 
-    fp = fopen(filename, "w");
+   // fp = fopen(filename, "w");
     while (1)
     {
         n = recv(sockfd_s, buffer, SIZE, 0);
@@ -40,14 +39,14 @@ void write_file(int sockfd_s)
             break;
             return;
         }
-        fprintf(fp, "%s", buffer);
+        //fprintf(fp, "%s", buffer);
         bzero(buffer, SIZE);
     }
     return;
 }
 /* ******************************************** */
 
-int main()
+int main(int argc, char* argv[])
 {
     char *ip = "127.0.0.1";
     int port_s = 8080;
@@ -56,7 +55,7 @@ int main()
 
     int sockfd_s, new_sock;
     struct sockaddr_in server_addr, new_addr;
-    socklen_t addr_size;
+    SOCKET addr_size;
     char buffer[SIZE];
 
     /* ************************************************************ */

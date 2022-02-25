@@ -2,10 +2,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <windows.h>
 #include <string.h>
-#include <arpa/inet.h>
+#include <winsock2.h>
 #define SIZE 1024
+#define _CRT_SECURE_NO_WARNINGS
 
 void send_file(FILE *fp, int sockfd)
 {
@@ -23,7 +24,7 @@ void send_file(FILE *fp, int sockfd)
     }
 }
 
-int main()
+int main(int argc, char* argv[])
 {
     char *ip = "127.0.0.1";
     int port = 8080;
