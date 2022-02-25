@@ -7,3 +7,5 @@
 #define MAX_BUFFER 1024
 #define MSG_SIZE 26
 #define HAMM_MSG_SIZE 31
+#define HAMM_PAIRITY_BITS 5
+

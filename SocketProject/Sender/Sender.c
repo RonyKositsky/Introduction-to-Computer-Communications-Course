@@ -19,9 +19,9 @@ int main(int argc, char* argv[])
 {
 	SenderUtils_SenderInit(argv);
 	
-	// as long as we keep reading 11 bits from file (file is not empty and read is successful)
+	// As said, we can assume that we will get blocks of MSG_SIZE.
 	while (SenderUtils_ReadBytesFromFile() == MSG_SIZE)
-	{ //problem with size of sender buffer
+	{ 
 		SenderUtils_AddHammCode();
 		SenderUtils_AppendToBuffer();
 	}

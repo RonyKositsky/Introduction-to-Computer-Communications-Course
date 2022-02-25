@@ -20,7 +20,6 @@
 /************************************
 *      defines                      *
 ************************************/
-#define SEND_BUF_SIZE 1
 
 /************************************
 *       types                       *
@@ -46,21 +45,37 @@ typedef struct
 ************************************/
 static char SEND_BUF[MAX_BUFFER];
 static char REC_BUF[MAX_BUFFER];
-static int send_buf_cur_ind[SEND_BUF_SIZE];
+static int send_buf_cur_ind;
 static SenderArguments SenderArgs_s;
 static SenderParams SenderParams_s;
 
 /************************************
 *      static functions             *
 ************************************/
+
+/*!
+******************************************************************************
+\brief
+Printing statistics and relevant data.
+\return none
+*****************************************************************************/
 static void SenderUtils_PrintOutput()
 {
-
+	//TODO
 }
 
-// first will be the first char of the hammed_msg and second will be the second char.
-static void ham(char msg[2], char hammed_msg[2])
+/*!
+******************************************************************************
+\brief
+Creating the hamming code error correction code.
+\param
+ [in] argv - arguments from the user.
+\return none
+*****************************************************************************/
+static void SenderUtils_HammingErrorCorrectionCode(char msg[2], char hammed_msg[2])
 {
+
+	//TODO : Refator funciton.
 	unsigned char first = 0;
 	unsigned char second = 0;
 	unsigned char bits[11];
@@ -82,7 +97,6 @@ static void ham(char msg[2], char hammed_msg[2])
 	hammed_msg[1] = second;
 }
 
-
 /************************************
 *       API implementation          *
 ************************************/
@@ -97,10 +111,15 @@ Initialize the sender.
 *****************************************************************************/
 void SenderUtils_SenderInit(char* argv[])
 {
+	memset(&SenderArgs_s, 0, sizeof(SenderArguments));
+	memset(&SenderParams_s, 0, sizeof(SenderParams));
+
+	// Reading user input.
 	SenderArgs_s.ip = argv[1];
 	SenderArgs_s.port = atoi(argv[2]);
 	SenderArgs_s.filename = argv[3];
 
+	// Init params.
 	SenderParams_s.file = fopen(SenderArgs_s.filename, "rb");
 	SenderParams_s.socket = SocketTools_CreateSocket();
 	SocketTools_CreateAddress(&SenderParams_s.channel_addr, SenderArgs_s.port, SenderArgs_s.ip);
@@ -114,6 +133,7 @@ Adding hamming code to the message we have read.
 *****************************************************************************/
 void SenderUtils_AddHammCode()
 {
+	//TODO: Refactor.
 	int i;
 	int orig_mod, orig_index, hammed_mod, hammed_index;
 	char cur[2];
@@ -124,9 +144,9 @@ void SenderUtils_AddHammCode()
 		orig_index = (int)floor(11 * i / 8);
 		hammed_mod = 15 * i % 8;
 		hammed_index = (int)floor(15 * i / 8);
-		//get_next_n_bits(11, orig_index, orig_mod, original_msg, cur);
-		ham(cur, hammed_cur);
-		//join_cur_to_msg(HAMMED_MSG_SIZE, hammed_index, hammed_mod, hammed_msg, hammed_cur);
+		get_next_n_bits(11, orig_index, orig_mod, SenderParams_s.msg_buffer, cur);
+		SenderUtils_HammingErrorCorrectionCode(cur, hammed_cur);
+		join_cur_to_msg(HAMM_MSG_SIZE, hammed_index, hammed_mod, SenderParams_s.msg_hamming, hammed_cur);
 	}
 }
 
@@ -141,14 +161,15 @@ void SenderUtils_AppendToBuffer()
 {
 	for (int i = 0; i < HAMM_MSG_SIZE; i++) 
 	{
-		SEND_BUF[send_buf_cur_ind[0] + i] = SenderParams_s.msg_hamming[i];
+		SEND_BUF[send_buf_cur_ind + i] = SenderParams_s.msg_hamming[i];
 	}
-	send_buf_cur_ind[0] += HAMM_MSG_SIZE;
-	if (send_buf_cur_ind[0] > MAX_BUFFER - HAMM_MSG_SIZE)
+	send_buf_cur_ind += HAMM_MSG_SIZE;
+	if (send_buf_cur_ind > MAX_BUFFER - HAMM_MSG_SIZE)
 	{
 		Sleep(10);
+		// TODO: Send the message.
 		//send_message(sock, SEND_BUF, LARGE_NUM, addr);
-		//send_buf_cur_ind[0] = 0;
+		send_buf_cur_ind = 0;
 	}
 }
 
@@ -182,12 +203,29 @@ Tear down our sender.
 *****************************************************************************/
 void SenderUtils_SenderTearDown()
 {
-	// makes sure we send all the content of the SEND_BUF
-	//send_message(socket, SEND_BUF, send_buf_cur_ind[0], &SenderParams_s.channel_addr);
-	// waits for receiver to send message
-	//SenderParams_s.socket = read_message(socket, &SenderParams_s.channel_addr, REC_BUF, MAX_BUFFER);
-	//SenderUtils_PrintOutput();
-	//closesocket(socket);
+	//Sending the rest of the message.
+	MessageVars sendMsg =
+	{
+		.sock = SenderParams_s.socket,
+		.buf = SEND_BUF,
+		.buf_size = send_buf_cur_ind,
+		.addr = &SenderParams_s.channel_addr
+	};
+	SocketTools_SendMessage(&sendMsg);
+
+	// Waiting for the reciever to get the message.
+	MessageVars readMessage =
+	{
+		.sock = SenderParams_s.socket,
+		.buf = REC_BUF,
+		.buf_size = MAX_BUFFER,
+		.addr = &SenderParams_s.channel_addr
+	};
+	SocketTools_ReadMessage(&readMessage);
+	
+	// Closing.
+	SenderUtils_PrintOutput();
+	closesocket(SenderParams_s.socket);
 	fclose(SenderParams_s.file);
 }
 

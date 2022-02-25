@@ -47,6 +47,7 @@ void ChannelUtils_ChannelInit(char* argv[])
     //channel as server (recieves messages from the sender)
     SOCKET sender_sock = SocketTools_CreateSocket();
     SocketTools_CreateAddress(&ChParams_s.my_addr, ChArgs_s.port, NULL);
+    //TODO: Implement bind.
     //bind_socket(sender_sock, &my_addr);
 
     // channel as sender (sends messages to the server)
@@ -96,6 +97,9 @@ void ChannelUtils_ChannelTearDown()
     SocketTools_SendMessage(&ChParams_s.writeMsg);
     closesocket(ChParams_s.server_sock);
     closesocket(ChParams_s.sender_sock);
+
+    //TODO: Implement printing below.
+     
     //char* sender_ip_str = inet_ntoa((ChParams.sender_addr)->sin_addr);
     //print_channel_output(ChArgs.server_ip, sender_ip_str);
 }
