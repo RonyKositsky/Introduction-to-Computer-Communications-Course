@@ -47,8 +47,7 @@ void ChannelUtils_ChannelInit(char* argv[])
     //channel as server (recieves messages from the sender)
     SOCKET sender_sock = SocketTools_CreateSocket();
     SocketTools_CreateAddress(&ChParams_s.my_addr, ChArgs_s.port, NULL);
-    //TODO: Implement bind.
-    //bind_socket(sender_sock, &my_addr);
+    SocketTools_BindSocket(sender_sock, &ChParams_s.my_addr);
 
     // channel as sender (sends messages to the server)
     ChParams_s.server_sock = SocketTools_CreateSocket();

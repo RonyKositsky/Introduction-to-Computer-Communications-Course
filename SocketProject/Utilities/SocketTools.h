@@ -68,4 +68,14 @@ Sending message via socket.
 *****************************************************************************/
 int SocketTools_SendMessage(MessageVars* msgVars);
 
+/*!
+******************************************************************************
+\brief
+Binding the socket to the address.
+\param
+ [in] msgVars - The message arguments struct.
+\return the number of bits sent.
+*****************************************************************************/
+void SocketTools_BindSocket(SOCKET socket, struct sockaddr_in* addr);
+
 #endif //__SOCKET_TOOLS_H__

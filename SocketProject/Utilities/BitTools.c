@@ -9,7 +9,7 @@
 *      include                      *
 ************************************/
 #include "BitTools.h"
-
+#include <stdint.h>
 /************************************
 *      functions                    *
 ************************************/
@@ -39,89 +39,88 @@ void BitTools_GetMessageBits(char msg[2], char* bits, int size)
 	}
 }
 
-
-void BitTools_CheckBits(char bits[MSG_SIZE], char checkbits[HAMM_PAIRITY_BITS])
+uint32_t BitTools_PrepareHammingCodeNumber(char massage[MSG_SIZE])
 {
-	//TODO: Refactor.
+	uint32_t val = 1;
+	int hammingIndex = 0;
+	int stringIndex = 0;
 
-	unsigned char checkbit1, checkbit2, checkbit3, checkbit4;
-	checkbit1 = (bits[0] ^ bits[1] ^ bits[3] ^ bits[4] ^ bits[6] ^ bits[8] ^ bits[10]) & 1;
-	checkbit2 = (bits[0] ^ bits[2] ^ bits[3] ^ bits[5] ^ bits[6] ^ bits[9] ^ bits[10]) & 1;
-	checkbit3 = (bits[1] ^ bits[2] ^ bits[3] ^ bits[7] ^ bits[8] ^ bits[9] ^ bits[10]) & 1;
-	checkbit4 = (bits[4] ^ bits[5] ^ bits[6] ^ bits[7] ^ bits[8] ^ bits[9] ^ bits[10]) & 1;
-	checkbits[0] = checkbit1;
-	checkbits[1] = checkbit2; 
-	checkbits[2] = checkbit3; 
-	checkbits[3] = checkbit4;
-}
-
-void BitTools_ConcatenationMassage(int size, int index, int mod, char* msg, char cur[2])
-{
-	//TODO: Refactor.
-	unsigned char prev_char = msg[index];
-	unsigned char orig1 = cur[0];
-	unsigned char orig2 = cur[1];
-	unsigned char ret1, ret2, ret3;
-	if (mod == 0)
+	if (massage == NULL)
+		return 0;
+	
+	for (int index = 1; index < HAMM_MSG_SIZE; index++)
 	{
-		msg[index] = orig1;
-		msg[index + 1] = orig2;
-	}
-	else 
-	{
-		ret1 = (orig1 >> mod) | prev_char;
-		ret2 = (orig1 << (8 - mod)) | (orig2 >> mod);
-		ret3 = orig2 << (8 - mod);
-		msg[index] = ret1;
-		if (index + 1 < size) {
-			msg[index + 1] = ret2;
+		val <<= 1;
+		if (index == HammingPairingBitsIndexes[hammingIndex])
+		{
+			hammingIndex++;
 		}
-		if (index + 2 < size) {
-			msg[index + 2] = ret3;
+		else
+		{
+			val += massage[stringIndex] - '0';
+			stringIndex++;
 		}
 	}
+	
+	return val;
 }
 
-void BitTools_GetNextNBists(int n, int index, int mod, char* msg, char result[2])
+/*!
+******************************************************************************
+\brief
+Adding to recieved message 5 pairity bits.
+\return Message with uninitialized hamming code.
+*****************************************************************************/
+uint32_t BitTools_ConvertStringToUint(char* massage)
 {
-	//TODO: Refactor for sure.
-	unsigned char orig1 = msg[index]; 
-	char orig2 = msg[index + 1]; 
-	char orig3 = msg[index + 2];
+	uint32_t val = 0; 
+	int i = 0;
+	if (massage == NULL)
+		return 0;
 
-	int total_no_bits_needed_from_next_chars, no_bits_needed_from_orig2, no_bits_needed_from_orig3,
-		no_bits_from_orig2_in_ret1, no_bits_from_orig2_in_ret2;
-
-	unsigned char ret1_from_orig1, ret1_fron_orig2, ret1, filtered_orig2, filtered_orig3, ret2_from_orig2, ret2_from_orig3,
-		ret2;
-
-	total_no_bits_needed_from_next_chars = n - (8 - mod);
-
-	if (total_no_bits_needed_from_next_chars > 8) 
-	{
-		no_bits_needed_from_orig2 = 8;
-		no_bits_needed_from_orig3 = total_no_bits_needed_from_next_chars - 8;
-		filtered_orig2 = orig2;
-		filtered_orig3 = (orig3 >> (8 - no_bits_needed_from_orig3)) << (8 - no_bits_needed_from_orig3);
+	while (massage[i] == '0' || massage[i] == '1')
+	{  
+		val <<= 1;
+		val += massage[i] - '0';
+		i++;
 	}
-	else 
-	{
-		no_bits_needed_from_orig2 = total_no_bits_needed_from_next_chars;
-		no_bits_needed_from_orig3 = 0;
-		filtered_orig2 = (orig2 >> (8 - no_bits_needed_from_orig2)) << (8 - no_bits_needed_from_orig2);
-		filtered_orig3 = 0;
-	}
-	ret1_from_orig1 = orig1 << mod;
-	no_bits_from_orig2_in_ret1 = mod;
-	ret1_fron_orig2 = filtered_orig2 >> (8 - no_bits_from_orig2_in_ret1);
-	ret1 = ret1_from_orig1 | ret1_fron_orig2;
-	no_bits_from_orig2_in_ret2 = no_bits_needed_from_orig2 - no_bits_from_orig2_in_ret1;
-	ret2_from_orig2 = ((filtered_orig2 << no_bits_from_orig2_in_ret1) >> (8 - no_bits_from_orig2_in_ret2))
-		<< (8 - no_bits_from_orig2_in_ret2);
-	ret2_from_orig3 = filtered_orig3 >> ((n - 8) - no_bits_needed_from_orig3);
-	ret2 = ret2_from_orig2 | ret2_from_orig3;
-	result[0] = ret1;
-	result[1] = ret2;
+
+	return val;
 }
+
+/*!
+******************************************************************************
+\brief
+Adding to recieved message 5 pairity bits.
+\return Message with uninitialized hamming code.
+*****************************************************************************/
+void BitTools_ConvertUintToString(char* massage, int numberOfBits, uint32_t num)
+{
+	for (int i = 0; i < numberOfBits; i++)
+	{
+		massage[i] = (num & (int)1 << (numberOfBits - i - 1)) ? '1' : '0';
+	}
+	massage[num] = '\0';
+}
+
+/*!
+******************************************************************************
+\brief
+Adding to recieved message 5 pairity bits.
+\return Message with uninitialized hamming code.
+*****************************************************************************/
+int BitTools_BitwiseXOR(uint32_t num)
+{
+	int pairity = 0;
+	while (num)
+	{
+		pairity ^= num & 1;
+		num >>= 1;
+	}
+
+	return pairity;
+}
+
+
 
 
