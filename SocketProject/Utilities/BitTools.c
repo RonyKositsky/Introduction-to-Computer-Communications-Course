@@ -39,32 +39,6 @@ void BitTools_GetMessageBits(char msg[2], char* bits, int size)
 	}
 }
 
-uint32_t BitTools_PrepareHammingCodeNumber(char massage[MSG_SIZE])
-{
-	uint32_t val = 1;
-	int hammingIndex = 0;
-	int stringIndex = 0;
-
-	if (massage == NULL)
-		return 0;
-	
-	for (int index = 1; index < HAMM_MSG_SIZE; index++)
-	{
-		val <<= 1;
-		if (index == HammingPairingBitsIndexes[hammingIndex])
-		{
-			hammingIndex++;
-		}
-		else
-		{
-			val += massage[stringIndex] - '0';
-			stringIndex++;
-		}
-	}
-	
-	return val;
-}
-
 /*!
 ******************************************************************************
 \brief

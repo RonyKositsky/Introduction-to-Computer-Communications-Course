@@ -11,6 +11,7 @@
 *      include                      *
 ************************************/
 #include "Definitions.h"
+#include <stdint.h>
 
 /************************************
 *      defines                      *
@@ -18,6 +19,7 @@
 #define BIT_SET(a,b) ((a) |= (1<<(b)))
 #define BIT_CLEAR(a,b) ((a) &= ~(1<<(b)))
 #define CHECK_BIT(var,pos) ((var>>pos) & 1)
+#define BIT_FLIP(a,b) ((a) ^= (1ULL<<(b)))
 
 /************************************
 *       variables                   *
@@ -51,14 +53,6 @@ Initializing new socket.
 \return SOCKET.
 *****************************************************************************/
 void BitTools_GetMessageBits(char msg[2], char* bits, int size);
-
-/*!
-******************************************************************************
-\brief
-Adding to recieved message 5 pairity bits.
-\return Message with uninitialized hamming code.
-*****************************************************************************/
-uint32_t BitTools_PrepareHammingCodeNumber(char massage[MSG_SIZE]);
 
 /*!
 ******************************************************************************

@@ -220,8 +220,8 @@ uint32_t BitTools_GetMassageWithHamming(uint32_t message)
 		uint32_t masked = message & HammingMasks[i];
 		uint32_t pairity = BitTools_BitwiseXOR(masked);
 		
-		// Set to 1 if pairity is 1, otherwise the default is 0.
-		if (!pairity)	continue;
+		// Set to 1 if pairity is 1, otherwise the default is 0 so we don't need to change it.
+		if (!pairity) continue;
 		BIT_SET(message, HammingMasks[i]);
 	}
 	return hammeingMessage;

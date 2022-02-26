@@ -13,6 +13,7 @@
 #include <WinSock2.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <math.h>
 #include "../Utilities/Definitions.h"
 #include "../Utilities/SocketTools.h"
 #include "../Utilities/BitTools.h"
@@ -162,8 +163,11 @@ void ServerUtils_ParseMassage() {
 void ServerUtils_ParseNextBytesGroup()
 {
 	//GET NEXT NUMBER.
-	ServerUtils_StripHammingCode();
+	// uint32_t num = GetNextNum();
+	uint32_t num;
+	uint32_t strippedNumber = ServerUtils_StripHammingCode(num);
 	//WRITE TO FILE.
+	// Write to file(strippedNumber);
 }
 
 /*!
@@ -172,7 +176,30 @@ void ServerUtils_ParseNextBytesGroup()
 Returns the message without the hamming code. Making corrections if possible.
 \return Message to be written.
 *****************************************************************************/
-uint32_t ServerUtils_StripHammingCode()
+uint32_t ServerUtils_StripHammingCode(uint32_t message)
 {
-	//TODO: Implement and do error calculation.
+	uint32_t ret = message;
+	uint32_t paitiy = BitTools_BitwiseXOR(message);
+	if (!paitiy) // No error.
+		return ret;
+
+	// TODO: If we have 2+ errors.
+	
+	// We will use the 3blue1brown method to find the errored index.
+	// We will go from the highest index, and if there is difference in the pairty we will add 2^i.
+	int i = 0;
+	int index = 0;
+	for (int j = HAMM_PAIRITY_BITS - 1; j >= 0; j--)
+	{
+		uint32_t masked = message & HammingMasks[j];
+		uint32_t newPairity = BitTools_BitwiseXOR(masked);
+		if (newPairity != CHECK_BIT(message, HammingPairingBitsIndexes[j]))
+		{
+			index += (int)pow(2,i);
+		}
+		i++;
+	}
+
+	BIT_FLIP(ret, index);
+	return ret;
 }
