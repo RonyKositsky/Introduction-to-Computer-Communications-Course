@@ -129,7 +129,7 @@ void ServerUtils_HandleMessage(int bytesRecived)
 
 	ServerParams_s.BufferFilledBytes += bytesRecived; //add the number of recieved bytes to the relevant field
 	ServerUtils_ParseMassage();
-	// TODO: Make sure if we need to write it to file?
+	// TODO: Make sure if we need to write it to file.
 	//write_msg_to_file(file, parsed_msg);
 }
 

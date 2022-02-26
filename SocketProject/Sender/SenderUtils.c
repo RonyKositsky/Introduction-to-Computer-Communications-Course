@@ -18,10 +18,6 @@
 #include "../Utilities/BitTools.h"
 
 /************************************
-*      defines                      *
-************************************/
-
-/************************************
 *       types                       *
 ************************************/
 typedef struct
@@ -52,50 +48,8 @@ static SenderParams SenderParams_s;
 /************************************
 *      static functions             *
 ************************************/
-
-/*!
-******************************************************************************
-\brief
-Printing statistics and relevant data.
-\return none
-*****************************************************************************/
-static void SenderUtils_PrintOutput()
-{
-	//TODO
-}
-
-/*!
-******************************************************************************
-\brief
-Creating the hamming code error correction code.
-\param
- [in] argv - arguments from the user.
-\return none
-*****************************************************************************/
-static void SenderUtils_HammingErrorCorrectionCode(char msg[2], char hammed_msg[2])
-{
-
-	//TODO : Refator funciton.
-	unsigned char first = 0;
-	unsigned char second = 0;
-	unsigned char bits[11];
-	char checkbits[4];
-
-	// put all 11 msg bits separated in bits array
-	BitTools_GetMessageBits(msg, bits, 11);
-
-	// make first and second contain the data bits in the right places
-	first = first | (bits[0] << 5) | (bits[1] << 3) | (bits[2] << 2) | (bits[3] << 1);
-	second = second | (bits[4] << 6) | (bits[5] << 5) | (bits[6] << 4) | (bits[7] << 3) | (bits[8] << 2)
-		| (bits[9] << 1) | bits[10];
-	second = second << 1;
-	// calculate check bits by XORing the right bits
-	BitTools_CheckBits(bits, checkbits);
-	// place checkbits in first and second
-	first = first | (checkbits[0] << 7) | (checkbits[1] << 6) | (checkbits[2] << 4) | checkbits[3];
-	hammed_msg[0] = first;
-	hammed_msg[1] = second;
-}
+static void SenderUtils_PrintOutput();
+static void SenderUtils_HammingErrorCorrectionCode(char msg[2], char hammed_msg[2]);
 
 /************************************
 *       API implementation          *
@@ -144,9 +98,9 @@ void SenderUtils_AddHammCode()
 		orig_index = (int)floor(11 * i / 8);
 		hammed_mod = 15 * i % 8;
 		hammed_index = (int)floor(15 * i / 8);
-		get_next_n_bits(11, orig_index, orig_mod, SenderParams_s.msg_buffer, cur);
+		BitTools_GetNextNBists(11, orig_index, orig_mod, SenderParams_s.msg_buffer, cur);
 		SenderUtils_HammingErrorCorrectionCode(cur, hammed_cur);
-		join_cur_to_msg(HAMM_MSG_SIZE, hammed_index, hammed_mod, SenderParams_s.msg_hamming, hammed_cur);
+		BitTools_ConcatenationMassage(HAMM_MSG_SIZE, hammed_index, hammed_mod, SenderParams_s.msg_hamming, hammed_cur);
 	}
 }
 
@@ -229,4 +183,50 @@ void SenderUtils_SenderTearDown()
 	fclose(SenderParams_s.file);
 }
 
+/************************************
+* static implementation             *
+************************************/
 
+/*!
+******************************************************************************
+\brief
+Printing statistics and relevant data.
+\return none
+*****************************************************************************/
+static void SenderUtils_PrintOutput()
+{
+	//TODO
+}
+
+/*!
+******************************************************************************
+\brief
+Creating the hamming code error correction code.
+\param
+ [in] argv - arguments from the user.
+\return none
+*****************************************************************************/
+static void SenderUtils_HammingErrorCorrectionCode(char msg[2], char hammed_msg[2])
+{
+
+	//TODO : Refator funciton.
+	unsigned char first = 0;
+	unsigned char second = 0;
+	unsigned char bits[11];
+	char checkbits[4];
+
+	// put all 11 msg bits separated in bits array
+	BitTools_GetMessageBits(msg, bits, 11);
+
+	// make first and second contain the data bits in the right places
+	first = first | (bits[0] << 5) | (bits[1] << 3) | (bits[2] << 2) | (bits[3] << 1);
+	second = second | (bits[4] << 6) | (bits[5] << 5) | (bits[6] << 4) | (bits[7] << 3) | (bits[8] << 2)
+		| (bits[9] << 1) | bits[10];
+	second = second << 1;
+	// calculate check bits by XORing the right bits
+	BitTools_CheckBits(bits, checkbits);
+	// place checkbits in first and second
+	first = first | (checkbits[0] << 7) | (checkbits[1] << 6) | (checkbits[2] << 4) | checkbits[3];
+	hammed_msg[0] = first;
+	hammed_msg[1] = second;
+}

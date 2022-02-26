@@ -9,7 +9,3 @@
 /SocketProject/Server/Debug/*
 /SocketProject/Utilities/Debug/*
 /SocketProject/Debug/*
-/SocketProject/Channel/Channel.vcxproj
-/SocketProject/Server/Server.vcxproj
-/SocketProject/Sender/Sender.vcxproj
-/SocketProject/Utilities/Utilities.vcxproj
