@@ -41,9 +41,13 @@ int main(int argc, char* argv[])
             //sender is ready
             ChannelUtils_PrepareReadMsg();
             ChParams_s.msg_size_from_sender = SocketTools_ReadMessage(&ChParams_s.readMsg); // Read message from client
-            //randomly_flip_msg_bits(CHANNEL_REC_BUF, seed, prob); //flip REC_BUF bits
+
+            // TODO: Add noise.
+            //randomly_flip_msg_bits(CHANNEL_REC_BUF, seed, prob); 
+
             ChannelUtils_PrepareWriteMsg();
             SocketTools_SendMessage(&ChParams_s.writeMsg);
+
             //channel_output_params[1] += msg_size_from_sender;
         }
     }

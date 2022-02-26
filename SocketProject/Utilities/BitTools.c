@@ -55,7 +55,7 @@ void BitTools_CheckBits(char bits[MSG_SIZE], char checkbits[HAMM_PAIRITY_BITS])
 	checkbits[3] = checkbit4;
 }
 
-void join_cur_to_msg(int size, int index, int mod, char* msg, char cur[2])
+void BitTools_ConcatenationMassage(int size, int index, int mod, char* msg, char cur[2])
 {
 	//TODO: Refactor.
 	unsigned char prev_char = msg[index];
@@ -82,23 +82,30 @@ void join_cur_to_msg(int size, int index, int mod, char* msg, char cur[2])
 	}
 }
 
-void get_next_n_bits(int n, int index, int mod, char* msg, char result[2])
+void BitTools_GetNextNBists(int n, int index, int mod, char* msg, char result[2])
 {
 	//TODO: Refactor for sure.
-	unsigned char orig1 = msg[index]; char orig2 = msg[index + 1]; char orig3 = msg[index + 2];
+	unsigned char orig1 = msg[index]; 
+	char orig2 = msg[index + 1]; 
+	char orig3 = msg[index + 2];
+
 	int total_no_bits_needed_from_next_chars, no_bits_needed_from_orig2, no_bits_needed_from_orig3,
 		no_bits_from_orig2_in_ret1, no_bits_from_orig2_in_ret2;
+
 	unsigned char ret1_from_orig1, ret1_fron_orig2, ret1, filtered_orig2, filtered_orig3, ret2_from_orig2, ret2_from_orig3,
 		ret2;
 
 	total_no_bits_needed_from_next_chars = n - (8 - mod);
-	if (total_no_bits_needed_from_next_chars > 8) {
+
+	if (total_no_bits_needed_from_next_chars > 8) 
+	{
 		no_bits_needed_from_orig2 = 8;
 		no_bits_needed_from_orig3 = total_no_bits_needed_from_next_chars - 8;
 		filtered_orig2 = orig2;
 		filtered_orig3 = (orig3 >> (8 - no_bits_needed_from_orig3)) << (8 - no_bits_needed_from_orig3);
 	}
-	else {
+	else 
+	{
 		no_bits_needed_from_orig2 = total_no_bits_needed_from_next_chars;
 		no_bits_needed_from_orig3 = 0;
 		filtered_orig2 = (orig2 >> (8 - no_bits_needed_from_orig2)) << (8 - no_bits_needed_from_orig2);

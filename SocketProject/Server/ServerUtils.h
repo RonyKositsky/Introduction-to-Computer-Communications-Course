@@ -16,7 +16,7 @@
 /************************************
 *      definitions                 *
 ************************************/
-
+#define QUIT (-1)
 /************************************
 *       types                       *
 ************************************/
@@ -29,16 +29,35 @@
 /*!
 ******************************************************************************
 \brief
-Initialize func
-\details
-Must be called only once
+Initialize the server.
 \param
- [in] counter_val - reset counter value
- [out] out_val    -
+ [in] argv - User input.
 \return none
 *****************************************************************************/
 void ServerUtils_ServerInit(char* argv[]);
 
+/*!
+******************************************************************************
+\brief
+Teardown the server.
+\return none
+*****************************************************************************/
 void ServerUtils_ServerTearDown();
+
+/*!
+******************************************************************************
+\brief
+ Waiting to recieve new message.
+\return QUIT if we want to finish sequence. Else, new message.
+*****************************************************************************/
+int ServerUtils_WaitForMessage();
+
+/*!
+******************************************************************************
+\brief
+ Handeling new received message.
+\return none
+*****************************************************************************/
+void ServerUtils_HandleMessage();
 
 #endif //__SERVER_UTILSw_H__
