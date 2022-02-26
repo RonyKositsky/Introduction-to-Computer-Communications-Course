@@ -20,7 +20,7 @@ ALL RIGHTS RESERVED
 int main(int argc, char* argv[])
 {
     fd_set active_fs;
-    ChannelUtils_ChannelInit(argv);
+    ChannelUtils_ChannelInit(argc,argv);
 
     FD_ZERO(&active_fs);
     while (1) 
@@ -43,7 +43,8 @@ int main(int argc, char* argv[])
             ChParams_s.msg_size_from_sender = SocketTools_ReadMessage(&ChParams_s.readMsg); // Read message from client
 
             // TODO: Add noise.
-            //randomly_flip_msg_bits(CHANNEL_REC_BUF, seed, prob); 
+            // randomly_flip_msg_bits(CHANNEL_REC_BUF, seed, prob); 
+            ChannelUtils_AddNoise(CHANNEL_REC_BUF, ChProps_s.seed, ChProps_s.prob, ChProps_s.cycle_length);
 
             ChannelUtils_PrepareWriteMsg();
             SocketTools_SendMessage(&ChParams_s.writeMsg);

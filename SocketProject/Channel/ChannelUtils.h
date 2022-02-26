@@ -17,23 +17,27 @@
 /************************************
 *       types                       *
 ************************************/
-typedef struct
-{
-	int port;
-	char* server_ip;
-	int server_port;
-	int prob;
-	int seed;
-}ChannelArguments;
+enum  noise_type { RANDOM, DETERMINISTIC };
 
 typedef struct
 {
-	int msg_size_from_sender;
-	SOCKET server_sock;
-	SOCKET sender_sock;
-	struct sockaddr_in my_addr;
-	struct sockaddr_in *sender_addr;
-	struct sockaddr_in *server_addr;
+	int					port			;
+	char*				server_ip		;
+	int					server_port		;
+	int					prob			;
+	int					seed			;
+	int					cycle_length	;
+	enum noise_type channel_noise_type	;
+}ChannelProps;
+
+typedef struct
+{
+	int						msg_size_from_sender  ;
+	SOCKET					server_sock			  ;
+	SOCKET					sender_sock			  ;
+	struct sockaddr_in		my_addr				  ;
+	struct sockaddr_in *	sender_addr			  ;
+	struct sockaddr_in *	server_addr			  ;
 	MessageVars readMsg;
 	MessageVars writeMsg;
 }ChannelParams;
@@ -41,13 +45,24 @@ typedef struct
 /************************************
 *      variables                    *
 ************************************/
-static ChannelParams ChParams_s;
-static ChannelArguments ChArgs_s;
-static char* CHANNEL_REC_BUF;
+static ChannelParams		ChParams_s		;
+static ChannelProps			ChProps_s		;
+static char*				CHANNEL_REC_BUF	;
 
 /************************************
 *       API                         *
 ************************************/
+
+/*!
+******************************************************************************
+\brief
+Parse CLI Arguments
+\param
+ [in] argv - arguments from the user.
+	  argc - num of atrguments from user.
+\return none
+*****************************************************************************/
+void ChannelUtils_ParseArguments(int argc, char* argv[]);
 
 /*!
 ******************************************************************************
@@ -57,7 +72,7 @@ Initialize the channel.
  [in] argv - arguments from the user.
 \return none
 *****************************************************************************/
-void ChannelUtils_ChannelInit(char* argv[]);
+void ChannelUtils_ChannelInit(int argc, char* argv[]);
 
 /*!
 ******************************************************************************
