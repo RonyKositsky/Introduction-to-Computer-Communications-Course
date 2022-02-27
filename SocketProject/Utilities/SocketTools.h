@@ -22,6 +22,7 @@ typedef struct
 	struct sockaddr_in *addr;
 	char* buf;
 	int buf_size;
+	int bits_flipped;
 }MessageVars;
 
 /************************************
@@ -67,5 +68,15 @@ Sending message via socket.
 \return the number of bits sent.
 *****************************************************************************/
 int SocketTools_SendMessage(MessageVars* msgVars);
+
+/*!
+******************************************************************************
+\brief
+Binding the socket to the address.
+\param
+ [in] msgVars - The message arguments struct.
+\return the number of bits sent.
+*****************************************************************************/
+void SocketTools_BindSocket(SOCKET socket, struct sockaddr_in* addr);
 
 #endif //__SOCKET_TOOLS_H__

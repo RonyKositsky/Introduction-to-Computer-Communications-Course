@@ -63,11 +63,10 @@ void ChannelUtils_ChannelInit(int argc, char* argv[])
 	ChannelUtils_ParseArguments(argc, argv);
 	{
 
-		//channel as server (recieves messages from the sender)
-		SOCKET sender_sock = SocketTools_CreateSocket();
-		SocketTools_CreateAddress(&ChParams_s.my_addr, ChProps_s.port, NULL);
-		//TODO: Implement bind.
-		//bind_socket(sender_sock, &my_addr);
+    //channel as server (recieves messages from the sender)
+    SOCKET sender_sock = SocketTools_CreateSocket();
+    SocketTools_CreateAddress(&ChParams_s.my_addr, ChProps_s.port, NULL);
+    SocketTools_BindSocket(sender_sock, &ChParams_s.my_addr);
 
 		// channel as sender (sends messages to the server)
 		ChParams_s.server_sock = SocketTools_CreateSocket();
@@ -137,11 +136,33 @@ void ChannelUtils_ChannelTearDown()
 	//print_channel_output(ChArgs.server_ip, sender_ip_str);
 }
 
+void Channelutils_FlipBit(int ind, char* msg) {
+	
+	if (msg[ind] == '1') {
+		msg[ind] = '0';
+	}
+
+	else {
+		msg[ind] = '1';
+	};
+};
+
+void Channelutils_AddDeterministicNoise(char* msg, int cycle_length, int bits_flipped_cnt){
+	for (int c = 0; msg[c] != '\0'; c++) {
+		if (c % cycle_length == 0) {
+			Channelutils_FlipBit(msg, c);
+			bits_flipped_cnt++;
+
+		};
+	};
+	};
+
+
 /*****************************************************************************/
 void Channelutils_AddRandomNoise(char* msg, int seed, int prob) {
 
 };
 /*****************************************************************************/
-void Channelutils_AddDeterministicNoise(char* msg, int cycle_length) {
-
-};
+//void Channelutils_AddDeterministicNoise(char* msg, int cycle_length) {
+//
+//};

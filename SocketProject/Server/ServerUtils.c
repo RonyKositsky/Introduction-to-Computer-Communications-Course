@@ -12,6 +12,8 @@
 #include "ServerUtils.h"
 #include <WinSock2.h>
 #include <stdio.h>
+#include <stdint.h>
+#include <math.h>
 #include "../Utilities/Definitions.h"
 #include "../Utilities/SocketTools.h"
 #include "../Utilities/BitTools.h"
@@ -55,8 +57,8 @@ static ServerOutputParams ServerOutParams_s;
 ************************************/
 static void ServerUtils_PrintOutput();
 static void ServerUtils_ParseMassage();
-static void ServerUtils_ParseNexrtBytesGroup();
-static void ServerUtils_StripHammingCode(char msg[2], char result[2]);
+static void ServerUtils_ParseNextBytesGroup();
+static uint32_t ServerUtils_StripHammingCode();
 
 /************************************
 *       API implementation          *
@@ -84,9 +86,7 @@ void ServerUtils_ServerInit(char* argv[])
 	ServerParams_s.socket = SocketTools_CreateSocket();
 	ServerParams_s.file = fopen(ServerArgs_s.filename, "rb");
 	SocketTools_CreateAddress(&ServerParams_s.server_addr, ServerArgs_s.port, INADDR_ANY);
-
-	// TODO: Implement bind.
-	//bind_socket(sock, &server_addr);
+	SocketTools_BindSocket(ServerParams_s.socket, &ServerParams_s.server_addr);
 }
 
 /*!
@@ -127,7 +127,7 @@ void ServerUtils_HandleMessage(int bytesRecived)
 		ServerParams_s.file = fopen(ServerArgs_s.filename, "wb");
 	}
 
-	ServerParams_s.BufferFilledBytes += bytesRecived; //add the number of recieved bytes to the relevant field
+	ServerParams_s.BufferFilledBytes += bytesRecived; 
 	ServerUtils_ParseMassage();
 	// TODO: Make sure if we need to write it to file.
 	//write_msg_to_file(file, parsed_msg);
@@ -154,61 +154,52 @@ void ServerUtils_ParseMassage() {
 	int total_iterations = ServerParams_s.BufferFilledBytes / HAMM_MSG_SIZE;
 	for (int i = 0; i < total_iterations; i++) 
 	{
-		ServerUtils_ParseNexrtBytesGroup();
+		ServerUtils_ParseNextBytesGroup();
 		ServerOutParams_s.BytesRecieved += HAMM_MSG_SIZE;
 	}
 }
 
 
-void ServerUtils_ParseNexrtBytesGroup()
+void ServerUtils_ParseNextBytesGroup()
 {
-	int i, orig_mod, orig_index, res_mod, res_index;
-	char cur_hammed[2];
-	char cur[2];
-	for (i = 0; i < 8; i++)
-	{
-		orig_mod = 15 * i % 8;
-		orig_index = (int)floor((15 * i) / 8);
-		res_mod = 11 * i % 8;
-		res_index = (int)floor(11 * i / 8);
-		BitTools_GetNextNBists(15, orig_index, orig_mod, bytes, cur_hammed);
-		ServerUtils_StripHammingCode(cur_hammed, cur);
-		BitTools_ConcatenationMassage(MSG_SIZE, res_index, res_mod, result, cur);
-	}
+	//GET NEXT NUMBER.
+	// uint32_t num = GetNextNum();
+	uint32_t num;
+	uint32_t strippedNumber = ServerUtils_StripHammingCode(num);
+	//WRITE TO FILE.
+	// Write to file(strippedNumber);
 }
 
-// takes the MSB 15 bits in msg and strips them into 11 bits of unhammed result.
-// verifies no errors happened
-void ServerUtils_StripHammingCode(char msg[2], char result[2]) {
-	char bits[HAMMED_MSG_SIZE];
-	unsigned char first, second;
-	char temp[2];
-	char eleven_bits[11];
-	char checkbits[4];
-	char position[4];
-	int ind;
-	get_msg_bits(msg, bits, HAMMED_MSG_SIZE);
-	first = (bits[2] << 7) | (bits[4] << 6) | (bits[5] << 5) | (bits[6] << 4) | (bits[8] << 3) |
-		(bits[9] << 2) | (bits[10] << 1) | bits[11];
-	second = (bits[12] << 7) | (bits[13] << 6) | (bits[14] << 5);
-	temp[0] = first; temp[1] = second;
-	get_msg_bits(temp, eleven_bits, 11);
-	calc_checkbits(eleven_bits, checkbits);
-	position[0] = checkbits[3] ^ bits[7]; position[1] = checkbits[2] ^ bits[3];
-	position[2] = checkbits[1] ^ bits[1]; position[3] = checkbits[0] ^ bits[0];
-	ind = position_array_to_index(position);
-	// if an error was detected:
-	if (ind != 0) {
-		output_params[2]++;
-		bits[ind - 1] = 1 - bits[ind - 1];
-		if (ind > 8) {
-			second = (bits[12] << 7) | (bits[13] << 6) | (bits[14] << 5);
+/*!
+******************************************************************************
+\brief
+Returns the message without the hamming code. Making corrections if possible.
+\return Message to be written.
+*****************************************************************************/
+uint32_t ServerUtils_StripHammingCode(uint32_t message)
+{
+	uint32_t ret = message;
+	uint32_t paitiy = BitTools_BitwiseXOR(message);
+	if (!paitiy) // No error.
+		return ret;
+
+	// TODO: If we have 2+ errors.
+	
+	// We will use the 3blue1brown method to find the errored index.
+	// We will go from the highest index, and if there is difference in the pairty we will add 2^i.
+	int i = 0;
+	int index = 0;
+	for (int j = HAMM_PAIRITY_BITS - 1; j >= 0; j--)
+	{
+		uint32_t masked = message & HammingMasks[j];
+		uint32_t newPairity = BitTools_BitwiseXOR(masked);
+		if (newPairity != CHECK_BIT(message, HammingPairingBitsIndexes[j]))
+		{
+			index += (int)pow(2,i);
 		}
-		else {
-			first = (bits[2] << 7) | (bits[4] << 6) | (bits[5] << 5) | (bits[6] << 4) | (bits[8] << 3) |
-				(bits[9] << 2) | (bits[10] << 1) | bits[11];
-		}
+		i++;
 	}
-	result[0] = first;
-	result[1] = second;
+
+	BIT_FLIP(ret, index);
+	return ret;
 }

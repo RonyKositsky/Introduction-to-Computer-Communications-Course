@@ -137,6 +137,17 @@ int SocketTools_SendMessage(MessageVars* msgVars)
 	return size;
 }
 
+void SocketTools_BindSocket(SOCKET socket, struct sockaddr_in* addr) {
+	WSADATA wsaData;
+	WORD wVersionRequested = MAKEWORD(1, 1);
+	WSAStartup(wVersionRequested, &wsaData);
+	if ((bind(socket, (struct sockaddr*)addr, sizeof(*addr))) < 0) 
+	{
+		fprintf(stderr, "bind failed with error %d \n", WSAGetLastError());
+		exit(-1);
+	}
+}
+
 
 
 

@@ -44,8 +44,7 @@ int main(int argc, char* argv[])
 
             // TODO: Add noise.
             // randomly_flip_msg_bits(CHANNEL_REC_BUF, seed, prob); 
-            ChannelUtils_AddNoise(CHANNEL_REC_BUF, ChProps_s.seed, ChProps_s.prob, ChProps_s.cycle_length);
-
+            ChannelUtils_AddNoise(CHANNEL_REC_BUF, ChProps_s.seed, ChProps_s.prob, ChProps_s.cycle_length, &ChParams_s.writeMsg.bits_flipped);
             ChannelUtils_PrepareWriteMsg();
             SocketTools_SendMessage(&ChParams_s.writeMsg);
 

@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <winsock2.h>
+#include <stdint.h>
 #include "SenderUtils.h"
 #include "../Utilities/Definitions.h"
 #include "../Utilities/SocketTools.h"
@@ -49,7 +50,7 @@ static SenderParams SenderParams_s;
 *      static functions             *
 ************************************/
 static void SenderUtils_PrintOutput();
-static void SenderUtils_HammingErrorCorrectionCode(char msg[2], char hammed_msg[2]);
+static uint32_t SenderUtils_ConvertMessageToUint(char* massage);
 
 /************************************
 *       API implementation          *
@@ -79,30 +80,6 @@ void SenderUtils_SenderInit(char* argv[])
 	SocketTools_CreateAddress(&SenderParams_s.channel_addr, SenderArgs_s.port, SenderArgs_s.ip);
 }
 
-/*!
-******************************************************************************
-\brief
-Adding hamming code to the message we have read.
-\return none
-*****************************************************************************/
-void SenderUtils_AddHammCode()
-{
-	//TODO: Refactor.
-	int i;
-	int orig_mod, orig_index, hammed_mod, hammed_index;
-	char cur[2];
-	char hammed_cur[2];
-	for (i = 0; i < 8; i++)
-	{
-		orig_mod = 11 * i % 8;
-		orig_index = (int)floor(11 * i / 8);
-		hammed_mod = 15 * i % 8;
-		hammed_index = (int)floor(15 * i / 8);
-		BitTools_GetNextNBists(11, orig_index, orig_mod, SenderParams_s.msg_buffer, cur);
-		SenderUtils_HammingErrorCorrectionCode(cur, hammed_cur);
-		BitTools_ConcatenationMassage(HAMM_MSG_SIZE, hammed_index, hammed_mod, SenderParams_s.msg_hamming, hammed_cur);
-	}
-}
 
 /*!
 ******************************************************************************
@@ -183,6 +160,13 @@ void SenderUtils_SenderTearDown()
 	fclose(SenderParams_s.file);
 }
 
+void SenderUtils_AddHammCode()
+{
+	uint32_t message = SenderUtils_ConvertMessageToUint(SenderParams_s.msg_buffer);
+	uint32_t messageHamming = BitTools_GetMassageWithHamming(message);
+	BitTools_ConvertUintToString(SenderParams_s.msg_hamming, HAMM_MSG_SIZE, messageHamming);
+}
+
 /************************************
 * static implementation             *
 ************************************/
@@ -198,35 +182,47 @@ static void SenderUtils_PrintOutput()
 	//TODO
 }
 
+
 /*!
 ******************************************************************************
 \brief
-Creating the hamming code error correction code.
-\param
- [in] argv - arguments from the user.
-\return none
+Adding to recieved message 5 pairity bits.
+\return Message with uninitialized hamming code.
 *****************************************************************************/
-static void SenderUtils_HammingErrorCorrectionCode(char msg[2], char hammed_msg[2])
+uint32_t SenderUtils_ConvertMessageToUint(char* massage)
 {
+	uint32_t val = 0;
+	int i = 0;
+	if (massage == NULL)
+		return 0;
 
-	//TODO : Refator funciton.
-	unsigned char first = 0;
-	unsigned char second = 0;
-	unsigned char bits[11];
-	char checkbits[4];
+	while (massage[i] == '0' || massage[i] == '1')
+	{
+		val <<= 1;
+		val += massage[i] - '0';
+		i++;
+	}
 
-	// put all 11 msg bits separated in bits array
-	BitTools_GetMessageBits(msg, bits, 11);
+	return val;
+}
 
-	// make first and second contain the data bits in the right places
-	first = first | (bits[0] << 5) | (bits[1] << 3) | (bits[2] << 2) | (bits[3] << 1);
-	second = second | (bits[4] << 6) | (bits[5] << 5) | (bits[6] << 4) | (bits[7] << 3) | (bits[8] << 2)
-		| (bits[9] << 1) | bits[10];
-	second = second << 1;
-	// calculate check bits by XORing the right bits
-	BitTools_CheckBits(bits, checkbits);
-	// place checkbits in first and second
-	first = first | (checkbits[0] << 7) | (checkbits[1] << 6) | (checkbits[2] << 4) | checkbits[3];
-	hammed_msg[0] = first;
-	hammed_msg[1] = second;
+/*!
+******************************************************************************
+\brief
+Adding to recieved message 5 pairity bits.
+\return Message with uninitialized hamming code.
+*****************************************************************************/
+uint32_t BitTools_GetMassageWithHamming(uint32_t message)
+{
+	uint32_t hammeingMessage = message;
+	for (int i = 0; i < HAMM_PAIRITY_BITS; i++)
+	{
+		uint32_t masked = message & HammingMasks[i];
+		uint32_t pairity = BitTools_BitwiseXOR(masked);
+		
+		// Set to 1 if pairity is 1, otherwise the default is 0 so we don't need to change it.
+		if (!pairity) continue;
+		BIT_SET(message, HammingMasks[i]);
+	}
+	return hammeingMessage;
 }
