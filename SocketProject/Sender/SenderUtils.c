@@ -4,6 +4,7 @@
 \date 25 February 2022
 \author Jonathan Matetzky & Rony Kosistky
 *****************************************************************************/
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 /************************************
 *      include                      *
@@ -19,13 +20,19 @@
 #include "../Utilities/BitTools.h"
 
 /************************************
+*      definitions                 *
+************************************/
+#define MAX_LIMIT 1000
+
+/************************************
 *       types                       *
 ************************************/
 typedef struct
 {
 	char* ip;
 	int port;
-	char* filename;
+	char filename[MAX_LIMIT];
+	char filename2[MAX_LIMIT];
 }SenderArguments;
 
 typedef struct
@@ -45,6 +52,8 @@ static char REC_BUF[MAX_BUFFER];
 static int send_buf_cur_ind;
 static SenderArguments SenderArgs_s;
 static SenderParams SenderParams_s;
+
+
 
 /************************************
 *      static functions             *
@@ -72,12 +81,14 @@ void SenderUtils_SenderInit(char* argv[])
 	// Reading user input.
 	SenderArgs_s.ip = argv[1];
 	SenderArgs_s.port = atoi(argv[2]);
-	SenderArgs_s.filename = argv[3];
 
 	// Init params.
-	SenderParams_s.file = fopen(SenderArgs_s.filename, "rb");
 	SenderParams_s.socket = SocketTools_CreateSocket();
-	SocketTools_CreateAddress(&SenderParams_s.channel_addr, SenderArgs_s.port, SenderArgs_s.ip);
+	//SocketTools_CreateAddress(&SenderParams_s.channel_addr, SenderArgs_s.port, SenderArgs_s.ip);
+	SenderParams_s.channel_addr.sin_family		= AF_INET;
+	SenderParams_s.channel_addr.sin_addr.s_addr = inet_addr(SenderArgs_s.ip);
+	SenderParams_s.channel_addr.sin_port		= htons(SenderArgs_s.port);
+
 }
 
 
@@ -152,7 +163,7 @@ void SenderUtils_SenderTearDown()
 		.buf_size = MAX_BUFFER,
 		.addr = &SenderParams_s.channel_addr
 	};
-	SocketTools_ReadMessage(&readMessage);
+	//SocketTools_ReadMessage(&readMessage);
 	
 	// Closing.
 	SenderUtils_PrintOutput();
@@ -165,6 +176,15 @@ void SenderUtils_AddHammCode()
 	uint32_t message = SenderUtils_ConvertMessageToUint(SenderParams_s.msg_buffer);
 	uint32_t messageHamming = BitTools_GetMassageWithHamming(message);
 	BitTools_ConvertUintToString(SenderParams_s.msg_hamming, HAMM_MSG_SIZE, messageHamming);
+}
+
+void SenderUtils_GetFileName()
+{
+	//TODO: Handle errors, quit.
+	printf("File name:");
+	//scanf("%s", SenderArgs_s.filename);
+	strcpy(SenderArgs_s.filename, "C:\\GitUni\\Introduction-to-Computer-Communications-Course\\file.txt");
+	SenderParams_s.file = fopen(SenderArgs_s.filename, "rb");
 }
 
 /************************************

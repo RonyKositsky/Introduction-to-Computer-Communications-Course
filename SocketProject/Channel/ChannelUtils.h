@@ -83,4 +83,6 @@ Tearing down the channel.
 *****************************************************************************/
 void ChannelUtils_ChannelTearDown();
 
+void SenderUtils_GetFileName();
+
 #endif //__CHANNEL_UTILS_H__

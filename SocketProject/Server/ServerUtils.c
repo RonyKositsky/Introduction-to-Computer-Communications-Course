@@ -200,6 +200,6 @@ uint32_t ServerUtils_StripHammingCode(uint32_t message)
 		i++;
 	}
 
-	BIT_FLIP(ret, index);
+	ret = BIT_FLIP(ret, index);
 	return ret;
 }
