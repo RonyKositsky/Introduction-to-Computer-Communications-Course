@@ -30,13 +30,13 @@ int main(int argc, char* argv[])
     struct sockaddr_in my_addr; 
     struct sockaddr_in peer_addr;
 
-    SOCKET tcp_s = socket(AF_INET, SOCK_STREAM, 0);
+    SOCKET tcp_s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     my_addr.sin_family = AF_INET;
-    my_addr.sin_addr.s_addr = INADDR_ANY;
+    my_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
     my_addr.sin_port = htons(6342);
 
     int status = bind(tcp_s, (SOCKADDR*)&my_addr, sizeof(struct sockaddr));
-    status = listen(tcp_s, 5);
+    status = listen(tcp_s, SOMAXCONN);
     int len = sizeof(peer_addr);
 
     while (1)

@@ -24,13 +24,13 @@ int main(int argc, char* argv[])
 	if (iResult != NO_ERROR) 
 		printf("Error at WSAStartup()\n");
 
-	SOCKET s = socket(AF_INET, SOCK_STREAM, 0);
+	SOCKET s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	struct sockaddr_in remote_addr; 
 
 	
 	remote_addr.sin_family = AF_INET; 
-	remote_addr.sin_addr.s_addr = "192.168.254.4";
-	remote_addr.sin_port = htons(8888);
+	remote_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	remote_addr.sin_port = htons(6342);
 
 	int status = connect(s, (SOCKADDR*)&remote_addr, sizeof(struct sockaddr));
 
