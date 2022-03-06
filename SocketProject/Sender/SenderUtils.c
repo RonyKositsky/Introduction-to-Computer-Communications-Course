@@ -9,13 +9,10 @@
 /************************************
 *      include                      *
 ************************************/
-#include <stdio.h>
+
 #include <stdlib.h>
 #include <string.h>
-#include <winsock2.h>
-#include <stdint.h>
 #include "SenderUtils.h"
-#include "../Utilities/Definitions.h"
 #include "../Utilities/SocketTools.h"
 #include "../Utilities/BitTools.h"
 
@@ -35,14 +32,6 @@ typedef struct
 	char filename2[MAX_LIMIT];
 }SenderArguments;
 
-typedef struct
-{
-	SOCKET socket;
-	FILE* file;
-	struct sockaddr_in channel_addr;
-	char msg_buffer[MSG_SIZE];
-	char msg_hamming[HAMM_MSG_SIZE];
-}SenderParams;
 
 /************************************
 *      variables                 *
@@ -51,7 +40,7 @@ static char SEND_BUF[MAX_BUFFER];
 static char REC_BUF[MAX_BUFFER];
 static int send_buf_cur_ind;
 static SenderArguments SenderArgs_s;
-static SenderParams SenderParams_s;
+SenderParams SenderParams_s;
 
 /************************************
 *      static functions             *
@@ -77,37 +66,16 @@ void SenderUtils_SenderInit(char* argv[])
 	memset(&SenderParams_s, 0, sizeof(SenderParams));
 
 	// Reading user input.
-	SenderArgs_s.ip = argv[1];
-	SenderArgs_s.port = atoi(argv[2]);
+	/*SenderArgs_s.ip = argv[1];
+	SenderArgs_s.port = atoi(argv[2]);*/
+
+	SenderArgs_s.ip = "127.0.0.1";
+	SenderArgs_s.port = 6342;
 
 	// Init params.
-	SenderParams_s.socket = SocketTools_CreateSocket();
-	SocketTools_CreateAddress(&SenderParams_s.socket, SenderArgs_s.ip, SenderArgs_s.port, CLIENT);
+	SenderParams_s.socket = SocketTools_CreateSocket(SenderArgs_s.ip, SenderArgs_s.port, CLIENT);
 }
 
-
-/*!
-******************************************************************************
-\brief
-Append the massage with the hamming code to the writing buffer.
-We are filling the buffer until it is full, and then sending it.
-\return none
-*****************************************************************************/
-void SenderUtils_AppendToBuffer()
-{
-	for (int i = 0; i < HAMM_MSG_SIZE; i++) 
-	{
-		SEND_BUF[send_buf_cur_ind + i] = SenderParams_s.msg_hamming[i];
-	}
-	send_buf_cur_ind += HAMM_MSG_SIZE;
-	if (send_buf_cur_ind > MAX_BUFFER - HAMM_MSG_SIZE)
-	{
-		Sleep(10);
-		// TODO: Send the message.
-		//send_message(sock, SEND_BUF, LARGE_NUM, addr);
-		send_buf_cur_ind = 0;
-	}
-}
 
 /*!
 ******************************************************************************
@@ -117,11 +85,6 @@ Reading from the input file the next 26 bits.
 *****************************************************************************/
 int SenderUtils_ReadBytesFromFile()
 {
-	if (SenderParams_s.file == NULL)
-	{
-		fprintf(stderr, "NULL file.\n");
-		exit(-1);
-	}
 	int err = fread(SenderParams_s.msg_buffer, 1, MSG_SIZE, SenderParams_s.file);
 	if (err < 0)
 	{
@@ -138,41 +101,24 @@ Tear down our sender.
 \return none
 *****************************************************************************/
 void SenderUtils_SenderTearDown()
-{
-	//Sending the rest of the message.
-	MessageVars sendMsg =
-	{
-		.sock = SenderParams_s.socket,
-		.buf = SEND_BUF,
-		.buf_size = send_buf_cur_ind,
-		.addr = &SenderParams_s.channel_addr
-	};
-	SocketTools_SendMessage(&sendMsg);
-
-	// Waiting for the reciever to get the message.
-	MessageVars readMessage =
-	{
-		.sock = SenderParams_s.socket,
-		.buf = REC_BUF,
-		.buf_size = MAX_BUFFER,
-		.addr = &SenderParams_s.channel_addr
-	};
+{	
 	//SocketTools_ReadMessage(&readMessage);
 	
 	// Closing.
 	SenderUtils_PrintOutput();
-	closesocket(SenderParams_s.socket);
+	int a = shutdown(SenderParams_s.socket, SD_SEND);
+	int b = closesocket(SenderParams_s.socket);
 	fclose(SenderParams_s.file);
 }
 
 void SenderUtils_AddHammCode()
 {
 	uint32_t message = SenderUtils_ConvertMessageToUint(SenderParams_s.msg_buffer);
-	uint32_t messageHamming = BitTools_GetMassageWithHamming(message);
-	BitTools_ConvertUintToString(SenderParams_s.msg_hamming, HAMM_MSG_SIZE, messageHamming);
+	SenderParams_s.messageHamming = BitTools_GetMassageWithHamming(message);
+	//SenderParams_s.messageHamming = 100;
 }
 
-void SenderUtils_GetFileName()
+void SenderUtils_OpenFile()
 {
 	//TODO: Handle errors, quit.
 	printf("File name:");

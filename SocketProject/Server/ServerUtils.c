@@ -24,14 +24,13 @@
 typedef struct
 {
 	int port;
-	char* filename;
+	char* ip;
 }ServerArguments;
 
 typedef struct
 {
 	SOCKET socket;
-	struct sockaddr_in server_addr;
-	struct sockaddr_in channel_addr;
+	uint32_t message;
 	FILE* file;
 	char ServerRecordBuffer[MAX_BUFFER];
 	int BufferFilledBytes;
@@ -56,9 +55,8 @@ static ServerOutputParams ServerOutParams_s;
 *      static functions             *
 ************************************/
 static void ServerUtils_PrintOutput();
-static void ServerUtils_ParseMassage();
-static void ServerUtils_ParseNextBytesGroup();
-static uint32_t ServerUtils_StripHammingCode();
+void SenderUtils_OpenFile();
+static uint32_t ServerUtils_StripHammingCode(uint32_t message);
 
 /************************************
 *       API implementation          *
@@ -79,14 +77,12 @@ void ServerUtils_ServerInit(char* argv[])
 	memset(&ServerOutParams_s, 0, sizeof(ServerOutputParams));
 
 	// Rading values from user.
-	ServerArgs_s.port = atoi(argv[1]);
-	ServerArgs_s.filename = argv[2];
+	ServerArgs_s.ip = argv[1];
+	ServerArgs_s.port = atoi(argv[2]);
 
 	// Init params.
-	ServerParams_s.socket = SocketTools_CreateSocket();
-	ServerParams_s.file = fopen(ServerArgs_s.filename, "rb");
-	SocketTools_CreateAddress(&ServerParams_s.server_addr, ServerArgs_s.port, INADDR_ANY);
-	SocketTools_BindSocket(ServerParams_s.socket, &ServerParams_s.server_addr);
+	ServerParams_s.socket = SocketTools_CreateSocket(ServerArgs_s.ip, ServerArgs_s.port, SERVER);
+	//SenderUtils_OpenFile();
 }
 
 /*!
@@ -97,7 +93,6 @@ Teardown the server.
 *****************************************************************************/
 void ServerUtils_ServerTearDown()
 {
-	//send_msg_to_client(sock, &channel_addr);
 	closesocket(ServerParams_s.socket);
 	fclose(ServerParams_s.file);
 	ServerUtils_PrintOutput();
@@ -109,9 +104,12 @@ void ServerUtils_ServerTearDown()
  Waiting to recieve new message.
 \return QUIT if we want to finish sequence. Else, new message.
 *****************************************************************************/
-int ServerUtils_WaitForMessage()
+void ServerUtils_WaitForMessage()
 {
-	return 1;
+	uint32_t rm;
+	SOCKET s = accept(ServerParams_s.socket, NULL, NULL);
+	int status = recv(s, &rm, sizeof(uint32_t), 0);
+	ServerParams_s.message = ntohl(rm);
 }
 
 /*!
@@ -124,7 +122,7 @@ void ServerUtils_HandleMessage(int bytesRecived)
 {
 	if (ServerParams_s.file == NULL)
 	{
-		ServerParams_s.file = fopen(ServerArgs_s.filename, "wb");
+	//	ServerParams_s.file = fopen(ServerArgs_s.filename, "wb");
 	}
 
 	ServerParams_s.BufferFilledBytes += bytesRecived; 
@@ -150,22 +148,22 @@ static void ServerUtils_PrintOutput()
 	fprintf(stderr, "Detected and corrected %d errors\n", ServerOutParams_s.FramesFixed);
 }
 
-void ServerUtils_ParseMassage() {
-	int total_iterations = ServerParams_s.BufferFilledBytes / HAMM_MSG_SIZE;
-	for (int i = 0; i < total_iterations; i++) 
-	{
-		ServerUtils_ParseNextBytesGroup();
-		ServerOutParams_s.BytesRecieved += HAMM_MSG_SIZE;
-	}
-}
+//void ServerUtils_ParseMassage() {
+//	int total_iterations = ServerParams_s.BufferFilledBytes / HAMM_MSG_SIZE;
+//	for (int i = 0; i < total_iterations; i++) 
+//	{
+//		ServerUtils_ParseNextBytesGroup();
+//		ServerOutParams_s.BytesRecieved += HAMM_MSG_SIZE;
+//	}
+//}
 
 
 void ServerUtils_ParseNextBytesGroup()
 {
 	//GET NEXT NUMBER.
 	// uint32_t num = GetNextNum();
-	uint32_t num;
-	uint32_t strippedNumber = ServerUtils_StripHammingCode(num);
+	//uint32_t num = 0;
+	//uint32_t strippedNumber = ServerUtils_StripHammingCode(num);
 	//WRITE TO FILE.
 	// Write to file(strippedNumber);
 }
@@ -202,4 +200,14 @@ uint32_t ServerUtils_StripHammingCode(uint32_t message)
 
 	ret = BIT_FLIP(ret, index);
 	return ret;
+}
+
+void SenderUtils_OpenFile()
+{
+	//TODO: Handle errors, quit.
+	printf("File name:");
+	//scanf("%s", SenderArgs_s.filename);
+	char filename[1000];
+	strcpy(filename, "C:\\GitUni\\Introduction-to-Computer-Communications-Course\\res.txt");
+	ServerParams_s.file = fopen(filename, "wb");
 }

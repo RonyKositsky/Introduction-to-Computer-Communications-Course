@@ -50,7 +50,7 @@ void ServerUtils_ServerTearDown();
  Waiting to recieve new message.
 \return QUIT if we want to finish sequence. Else, new message.
 *****************************************************************************/
-int ServerUtils_WaitForMessage();
+void ServerUtils_WaitForMessage();
 
 /*!
 ******************************************************************************
@@ -58,6 +58,6 @@ int ServerUtils_WaitForMessage();
  Handeling new received message.
 \return none
 *****************************************************************************/
-void ServerUtils_HandleMessage();
+void ServerUtils_HandleMessage(int bytesRecived);
 
 #endif //__SERVER_UTILSw_H__

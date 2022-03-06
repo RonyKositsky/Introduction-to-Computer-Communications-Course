@@ -11,6 +11,16 @@
 #include <winsock2.h>
 #include "ChannelUtils.h"
 #include "../Utilities/Definitions.h"
+#include <stdint.h>
+
+typedef struct
+{
+    int prob;
+    int seed;
+}ChannelArguments;
+
+static ChannelArguments ChArgs_s;
+ChannelParams ChParams_s;
 
 /*!
 ******************************************************************************
@@ -30,8 +40,8 @@ void ChannelUtils_ReadInput(char* argv[])
     ChParams_s.sender_ip = "127.0.0.1";
     ChParams_s.sender_port = 6342;
 
-    ChParams_s.sender_ip = "127.0.0.1";
-    ChParams_s.sender_port = 6343;
+    //ChParams_s.sender_ip = "127.0.0.1";
+    //ChParams_s.sender_port = 6343;
 }
 
 /*!
@@ -51,12 +61,11 @@ void ChannelUtils_ChannelInit(char* argv[])
     ChannelUtils_ReadInput(argv);
 
     //channel as server (recieves messages from the sender)
-    ChParams_s.sender_sock = SocketTools_CreateSocket();
-    SocketTools_CreateAddress(&ChParams_s.sender_sock, ChParams_s.sender_ip, ChArgs_s.server_port, SERVER);
+    ChParams_s.sender_sock = SocketTools_CreateSocket(ChParams_s.sender_ip, ChParams_s.sender_port, SERVER);
 
     // channel as sender (sends messages to the server)
-    ChParams_s.server_sock = SocketTools_CreateSocket();
-    SocketTools_CreateAddress(&ChParams_s.server_sock, ChParams_s.server_ip, ChArgs_s.server_port, CLIENT);
+    //ChParams_s.server_sock = SocketTools_CreateSocket();
+    //SocketTools_CreateAddress(&ChParams_s.server_sock, ChParams_s.server_ip, ChParams_s.server_port, CLIENT);
 }
 
 /*!
@@ -65,14 +74,12 @@ void ChannelUtils_ChannelInit(char* argv[])
 Preparing channel read massage that was sent.
 \return none
 *****************************************************************************/
-void ChannelUtils_ReadMsg()
+void ChannelUtils_ReadMsgFromSender()
 {
-    SOCKET s = accept(&ChParams_s.sender_sock, NULL, NULL);
-    ChParams_s.msg_size_from_sender = recv(s, ChParams_s.channel_recieve_buffer, MAX_BUFFER, 0);
-    /*ChParams_s.readMsg.sock = ChParams_s.server_sock;
-    ChParams_s.readMsg.addr = ChParams_s.server_addr;
-    ChParams_s.readMsg.buf = CHANNEL_REC_BUF;
-    ChParams_s.readMsg.buf_size = MAX_BUFFER;*/
+    uint32_t rm;
+    SOCKET s = accept(ChParams_s.sender_sock, NULL, NULL);
+    int status = recv(s, &rm, sizeof(uint32_t), 0);
+    ChParams_s.message = ntohl(rm);
 }
 
 /*!
@@ -81,12 +88,9 @@ void ChannelUtils_ReadMsg()
 Preparing channel to writing massage.
 \return none
 *****************************************************************************/
-void ChannelUtils_PrepareWriteMsg()
+void ChannelUtils_SendMsgToServer()
 {
-    ChParams_s.readMsg.sock = ChParams_s.sender_sock;
-    ChParams_s.readMsg.addr = ChParams_s.sender_addr;
-    ChParams_s.readMsg.buf = CHANNEL_REC_BUF;
-    ChParams_s.readMsg.buf_size = ChParams_s.msg_size_from_sender;
+   
 }
 
 /*!
@@ -97,10 +101,7 @@ Tearing down the channel.
 *****************************************************************************/
 void ChannelUtils_ChannelTearDown()
 {
-    ChannelUtils_ReadMsg();
-    ChannelUtils_PrepareWriteMsg();
-    SocketTools_ReadMessage(&ChParams_s.readMsg); //read the message from the server 
-    SocketTools_SendMessage(&ChParams_s.writeMsg);
+    ChannelUtils_ReadMsgFromSender();
     closesocket(ChParams_s.server_sock);
     closesocket(ChParams_s.sender_sock);
 

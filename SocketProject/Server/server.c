@@ -20,16 +20,17 @@ int main(int argc, char* argv[]){
 	ServerUtils_ServerInit(argv);
 	while (1)
 	{
-		bytesRecived = ServerUtils_WaitForMessage();
-		if (bytesRecived == QUIT)
-		{
-			// TODO: Implement quit.
-			break;
-		} 
-		else 
-		{
-			ServerUtils_HandleMessage(bytesRecived);
-		}
+		//bytesRecived = ServerUtils_WaitForMessage();
+		//if (bytesRecived == QUIT)
+		//{
+		//	// TODO: Implement quit.
+		//	break;
+		//} 
+		//else 
+		//{
+		//	ServerUtils_HandleMessage(bytesRecived);
+		//}
+		ServerUtils_WaitForMessage();
 	}
 
 	ServerUtils_ServerTearDown();

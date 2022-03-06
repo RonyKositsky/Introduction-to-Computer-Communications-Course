@@ -19,29 +19,19 @@
 ************************************/
 typedef struct
 {
-	int prob;
-	int seed;
-}ChannelArguments;
-
-typedef struct
-{
-	int msg_size_from_sender;
+	uint32_t message;
 	SOCKET server_sock;
 	SOCKET sender_sock;
 	char* sender_ip;
 	char* server_ip;
 	int sender_port;
 	int server_port;
-	MessageVars readMsg;
-	MessageVars writeMsg;
-	char channel_recieve_buffer[MAX_BUFFER];
 }ChannelParams;
 
 /************************************
 *      variables                    *
 ************************************/
-static ChannelParams ChParams_s;
-static ChannelArguments ChArgs_s;
+extern ChannelParams ChParams_s;
 
 /************************************
 *       API                         *
@@ -63,7 +53,7 @@ void ChannelUtils_ChannelInit(char* argv[]);
 Preparing channel read massage that was sent.
 \return none
 *****************************************************************************/
-void ChannelUtils_ReadMsg();
+void ChannelUtils_ReadMsgFromSender();
 
 /*!
 ******************************************************************************
@@ -71,7 +61,7 @@ void ChannelUtils_ReadMsg();
 Preparing channel to writing massage.
 \return none
 *****************************************************************************/
-void ChannelUtils_PrepareWriteMsg();
+void ChannelUtils_SendMsgToServer();
 
 /*!
 ******************************************************************************
@@ -81,6 +71,6 @@ Tearing down the channel.
 *****************************************************************************/
 void ChannelUtils_ChannelTearDown();
 
-void SenderUtils_GetFileName();
+void SenderUtils_OpenFile();
 
 #endif //__CHANNEL_UTILS_H__

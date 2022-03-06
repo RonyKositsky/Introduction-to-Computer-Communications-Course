@@ -11,19 +11,13 @@
 *      include                      *
 ************************************/
 #include <stdio.h>
+#include <stdint.h>
 #include <winsock2.h>
 #include "Definitions.h"
 
 /************************************
 *       types                       *
 ************************************/
-typedef struct
-{
-	SOCKET sock;
-	struct sockaddr_in *addr;
-	char* buf;
-	int buf_size;
-}MessageVars;
 
 /************************************
 *       API                         *
@@ -35,19 +29,8 @@ typedef struct
 Initializing new socket.
 \return SOCKET.
 *****************************************************************************/
-SOCKET SocketTools_CreateSocket();
+SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType type);
 
-/*!
-******************************************************************************
-\brief
-Creating socket address via reference.
-\param
- [in] sa   - Socket address pointer.
- [in] port - Port number.
- [in] ip   - The ip as string.
-\return none.
-*****************************************************************************/
-void SocketTools_CreateAddress(SOCKET* socket, char* ip,  int port, SocketType type);
 
 /*!
 ******************************************************************************
@@ -57,7 +40,7 @@ Reading message via socket.
  [in] msgVars - The message arguments struct.
 \return the number of bits recieved.
 *****************************************************************************/
-int SocketTools_ReadMessage(MessageVars* msgVars);
+int SocketTools_ReadMessage(SOCKET socket, uint32_t *message);
 
 /*!
 ******************************************************************************
@@ -67,6 +50,6 @@ Sending message via socket.
  [in] msgVars - The message arguments struct.
 \return the number of bits sent.
 *****************************************************************************/
-int SocketTools_SendMessage(MessageVars* msgVars);
+int SocketTools_SendMessage(SOCKET socket, uint32_t message);
 
 #endif //__SOCKET_TOOLS_H__
