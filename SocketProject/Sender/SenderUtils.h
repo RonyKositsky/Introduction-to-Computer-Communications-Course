@@ -68,5 +68,6 @@ void SenderUtils_SenderTearDown();
 
 void SenderUtils_OpenFile();
 
+SenderUtils_SendTerminationMessage();
 
 #endif //__SENDER_UTILS_H__

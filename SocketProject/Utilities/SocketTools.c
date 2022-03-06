@@ -81,7 +81,7 @@ Reading message via socket.
 int SocketTools_ReadMessage(SOCKET socket, uint32_t *message)
 {
 	uint32_t rm = 0;
-	int status = recv(socket, &rm, sizeof(uint32_t), 0);
+	int status = read(socket, &rm, sizeof(uint32_t), MSG_PEEK );
 	*message = ntohl(rm);
 }
 

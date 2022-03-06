@@ -72,8 +72,7 @@ void SenderUtils_SenderInit(char* argv[])
 	SenderArgs_s.ip = "127.0.0.1";
 	SenderArgs_s.port = 6342;
 
-	// Init params.
-	SenderParams_s.socket = SocketTools_CreateSocket(SenderArgs_s.ip, SenderArgs_s.port, CLIENT);
+//	SenderParams_s.socket = SocketTools_CreateSocket(SenderArgs_s.ip, SenderArgs_s.port, CLIENT);
 }
 
 
@@ -113,6 +112,7 @@ void SenderUtils_SenderTearDown()
 
 void SenderUtils_AddHammCode()
 {
+	SenderParams_s.socket = SocketTools_CreateSocket(SenderArgs_s.ip, SenderArgs_s.port, CLIENT);
 	uint32_t message = SenderUtils_ConvertMessageToUint(SenderParams_s.msg_buffer);
 	SenderParams_s.messageHamming = BitTools_GetMassageWithHamming(message);
 	//SenderParams_s.messageHamming = 100;

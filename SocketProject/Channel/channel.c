@@ -21,10 +21,10 @@ int main(int argc, char* argv[])
 {
     ChannelUtils_ChannelInit(argv);
     printf("YO\n");
+    SOCKET s = accept(ChParams_s.sender_sock, NULL, NULL);
 
     fd_set active_fs;
     FD_ZERO(&active_fs);
-    SOCKET s = accept(ChParams_s.sender_sock, NULL, NULL);
     int ready;
     struct timeval tv;
     tv.tv_sec = 1;
@@ -33,16 +33,26 @@ int main(int argc, char* argv[])
 
     while (1) 
     {
+        FD_ZERO(&active_fs);
         FD_SET(s, &active_fs);
-        ready = select(1, &active_fs, NULL, NULL, &tv);
-        if (ready < 0) {
-            fprintf(stderr, "select failed in channel");
+        ready = select(3, &active_fs, NULL, NULL, NULL);
+        if (ready != 0) 
+        {
+            if (FD_ISSET(s, &active_fs))
+            {
+                SocketTools_ReadMessage(s, &ChParams_s.message);
+                printf("%lu\n", ChParams_s.message);
+                if (ChParams_s.message == TERMINATION_MESSAGE)
+                {
+                    printf("YO\n");
+                    closesocket(s);
+                    break;
+                }
+            }
         }
-        else if (ready)
-        {  
-            SocketTools_ReadMessage(s, &ChParams_s.message);
-            printf("%lu\n", ChParams_s.message);
-        }
+        
+
+        printf("%lu", ChParams_s.message);
         
         // TODO: Add noise.
         //randomly_flip_msg_bits(CHANNEL_REC_BUF, seed, prob); 

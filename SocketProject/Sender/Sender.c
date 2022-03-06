@@ -28,6 +28,8 @@ int main(int argc, char* argv[])
 		SocketTools_SendMessage(SenderParams_s.socket, SenderParams_s.messageHamming);
 	}
 
+	SocketTools_SendMessage(SenderParams_s.socket, TERMINATION_MESSAGE);
+
 	SenderUtils_SenderTearDown();
 	return 0;
 }
