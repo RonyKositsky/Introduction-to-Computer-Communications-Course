@@ -4,7 +4,6 @@
 \file Server.c
 \date 25 February 2022
 \author Jonathan Matetzky & Rony Kosistky
-ALL RIGHTS RESERVED
 *****************************************************************************/
 
 /************************************

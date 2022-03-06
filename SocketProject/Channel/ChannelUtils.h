@@ -19,9 +19,6 @@
 ************************************/
 typedef struct
 {
-	int port;
-	char* server_ip;
-	int server_port;
 	int prob;
 	int seed;
 }ChannelArguments;
@@ -31,11 +28,13 @@ typedef struct
 	int msg_size_from_sender;
 	SOCKET server_sock;
 	SOCKET sender_sock;
-	struct sockaddr_in my_addr;
-	struct sockaddr_in *sender_addr;
-	struct sockaddr_in *server_addr;
+	char* sender_ip;
+	char* server_ip;
+	int sender_port;
+	int server_port;
 	MessageVars readMsg;
 	MessageVars writeMsg;
+	char channel_recieve_buffer[MAX_BUFFER];
 }ChannelParams;
 
 /************************************
@@ -43,7 +42,6 @@ typedef struct
 ************************************/
 static ChannelParams ChParams_s;
 static ChannelArguments ChArgs_s;
-static char* CHANNEL_REC_BUF;
 
 /************************************
 *       API                         *
@@ -65,7 +63,7 @@ void ChannelUtils_ChannelInit(char* argv[]);
 Preparing channel read massage that was sent.
 \return none
 *****************************************************************************/
-void ChannelUtils_PrepareReadMsg();
+void ChannelUtils_ReadMsg();
 
 /*!
 ******************************************************************************

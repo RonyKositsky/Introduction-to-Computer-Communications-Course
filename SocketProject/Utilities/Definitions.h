@@ -4,6 +4,10 @@
 \date 25 February 2022
 \author Jonathan Matetzky & Rony Kosistky
 *****************************************************************************/
+
+#ifndef __DEFINITIONS_H__
+#define __DEFINITIONS_H__
+
 #define MAX_BUFFER 1024
 #define MSG_SIZE 26
 #define HAMM_MSG_SIZE 31
@@ -20,3 +24,10 @@
 #define FOURTH_PAIRITY_MASK (0x3F807F00) //(11111111000000001111111000000000)
 #define FIFTH_PAIRITY_MASK  (0xFFFE0000) //(11111111111111100000000000000000)
 
+typedef enum
+{
+	CLIENT,
+	SERVER
+}SocketType;
+
+#endif //__SOCKET_TOOLS_H__

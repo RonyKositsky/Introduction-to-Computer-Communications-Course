@@ -12,6 +12,7 @@
 ************************************/
 #include <stdio.h>
 #include <winsock2.h>
+#include "Definitions.h"
 
 /************************************
 *       types                       *
@@ -46,7 +47,7 @@ Creating socket address via reference.
  [in] ip   - The ip as string.
 \return none.
 *****************************************************************************/
-void SocketTools_CreateAddress(struct sockaddr_in* sa, int port, char* ip);
+void SocketTools_CreateAddress(SOCKET* socket, char* ip,  int port, SocketType type);
 
 /*!
 ******************************************************************************
@@ -67,15 +68,5 @@ Sending message via socket.
 \return the number of bits sent.
 *****************************************************************************/
 int SocketTools_SendMessage(MessageVars* msgVars);
-
-/*!
-******************************************************************************
-\brief
-Binding the socket to the address.
-\param
- [in] msgVars - The message arguments struct.
-\return the number of bits sent.
-*****************************************************************************/
-void SocketTools_BindSocket(SOCKET socket, struct sockaddr_in* addr);
 
 #endif //__SOCKET_TOOLS_H__

@@ -53,8 +53,6 @@ static int send_buf_cur_ind;
 static SenderArguments SenderArgs_s;
 static SenderParams SenderParams_s;
 
-
-
 /************************************
 *      static functions             *
 ************************************/
@@ -84,11 +82,7 @@ void SenderUtils_SenderInit(char* argv[])
 
 	// Init params.
 	SenderParams_s.socket = SocketTools_CreateSocket();
-	//SocketTools_CreateAddress(&SenderParams_s.channel_addr, SenderArgs_s.port, SenderArgs_s.ip);
-	SenderParams_s.channel_addr.sin_family		= AF_INET;
-	SenderParams_s.channel_addr.sin_addr.s_addr = inet_addr(SenderArgs_s.ip);
-	SenderParams_s.channel_addr.sin_port		= htons(SenderArgs_s.port);
-
+	SocketTools_CreateAddress(&SenderParams_s.socket, SenderArgs_s.ip, SenderArgs_s.port, CLIENT);
 }
 
 

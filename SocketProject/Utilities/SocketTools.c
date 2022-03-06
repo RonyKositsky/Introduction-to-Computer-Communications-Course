@@ -3,9 +3,10 @@
 \file SocketTools.c
 \date 24 February 2022
 \author Jonathan Matetzky & Rony Kosistky
-ALL RIGHTS RESERVED
 *****************************************************************************/
 #define _CRT_SECURE_NO_WARNINGS
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+
 /************************************
 *      include                      *
 ************************************/
@@ -31,7 +32,6 @@ Initializing new socket.
 *****************************************************************************/
 SOCKET SocketTools_CreateSocket()
 {
-	SOCKET sockfd;
 	WSADATA wsaData;
 	WORD wVersionRequested = MAKEWORD(2, 2);
 	int err = WSAStartup(wVersionRequested, &wsaData);
@@ -41,7 +41,8 @@ SOCKET SocketTools_CreateSocket()
 		exit(-1);
 	}
 	
-	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
+	SOCKET sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (sockfd == INVALID_SOCKET)
 	{
 		fprintf(stderr, "Failed to create socket, error %d", WSAGetLastError());
 		exit(-1);
@@ -61,17 +62,23 @@ Creating socket address via reference.
  [in] ip   - The ip as string.
 \return none.
 *****************************************************************************/
-void SocketTools_CreateAddress(struct sockaddr_in* sa, int port, char* ip)
+void SocketTools_CreateAddress(SOCKET *socket, char* ip, int port, SocketType type)
 {
-	sa->sin_family = AF_INET;
-	sa->sin_port = port;
-	if (ip == NULL)
+	struct sockaddr_in sa;
+	int status;
+
+	sa.sin_family	   = AF_INET;
+	sa.sin_port		   = htons(port);
+	sa.sin_addr.s_addr = inet_addr(ip);
+
+	if (type == CLIENT)
 	{
-		sa->sin_addr.s_addr = htonl(INADDR_ANY);
-	}  
+		status = connect(*socket, (SOCKADDR*)&sa, sizeof(struct sockaddr));
+	}
 	else
 	{
-		InetPton(AF_INET, ip, &sa->sin_addr.s_addr);
+		status = bind(*socket, (SOCKADDR*)&sa, sizeof(struct sockaddr));
+		status = listen(*socket, SOMAXCONN);
 	}
 }
 
@@ -141,19 +148,6 @@ int SocketTools_SendMessage(MessageVars* msgVars)
 	}*/
 	return size;
 }
-
-void SocketTools_BindSocket(SOCKET socket, struct sockaddr_in* addr) {
-	WSADATA wsaData;
-	WORD wVersionRequested = MAKEWORD(2, 2);
-	WSAStartup(wVersionRequested, &wsaData);
-	if ((bind(socket, (struct sockaddr*)addr, sizeof(*addr))) < 0) 
-	{
-		fprintf(stderr, "bind failed with error %d \n", WSAGetLastError());
-		exit(-1);
-	}
-}
-
-
 
 
 
