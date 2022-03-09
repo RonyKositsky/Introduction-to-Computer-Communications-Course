@@ -24,6 +24,7 @@ typedef struct
 	uint32_t message;
 	uint32_t messageHamming;
 	char msg_buffer[MSG_SIZE];
+	char filename[FILE_NAME_BUFFER];
 	bool quit;
 }SenderParams;
 

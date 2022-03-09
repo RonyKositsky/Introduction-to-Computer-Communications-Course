@@ -18,12 +18,19 @@
 /************************************
 *       types                       *
 ************************************/
+typedef enum
+{
+	RANDOM,
+	DETERMINISTIC
+}Noise;
+
 typedef struct
 {
 	uint32_t message;
 	SOCKET server_sock;
 	SOCKET sender_sock;
 	SOCKET accepted_sock;
+	Noise noise_type;
 	char* sender_ip;
 	char* server_ip;
 	int sender_port;
@@ -48,7 +55,7 @@ Initialize the channel.
  [in] argv - arguments from the user.
 \return none
 *****************************************************************************/
-void ChannelUtils_ChannelInit(char* argv[]);
+void ChannelUtils_ChannelInit(int argc, char* argv[]);
 
 
 /*!
@@ -67,6 +74,12 @@ Tearing down the channel.
 *****************************************************************************/
 void ChannelUtils_ChannelTearDown();
 
-void SenderUtils_OpenFile();
+/*!
+******************************************************************************
+\brief
+Adding noise to recieved message.
+\return none
+*****************************************************************************/
+void ChannelUtils_AddNoiseToMessage();
 
 #endif //__CHANNEL_UTILS_H__

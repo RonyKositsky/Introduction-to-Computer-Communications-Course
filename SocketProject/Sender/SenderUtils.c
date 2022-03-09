@@ -110,8 +110,8 @@ void SenderUtils_OpenFile()
 	//TODO: Handle errors, quit.
 	printf("File name:");
 	//scanf("%s", SenderArgs_s.filename);
-	strcpy(SenderArgs_s.filename, "C:\\GitUni\\Introduction-to-Computer-Communications-Course\\file.txt");
-	SenderParams_s.file = fopen(SenderArgs_s.filename, "rb");
+	strcpy(SenderParams_s.filename, "C:\\GitUni\\Introduction-to-Computer-Communications-Course\\file.txt");
+	SenderParams_s.file = fopen(SenderParams_s.filename, "rb");
 	
 	//TODO: IF "quit" quit = 1;
 }

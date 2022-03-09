@@ -19,14 +19,14 @@
 ************************************/
 int main(int argc, char* argv[])
 {
-    ChannelUtils_ChannelInit(argv);
+    ChannelUtils_ChannelInit(argc, argv);
 
     while (!ChParams_s.quit)
     {
         while (ChParams_s.message == TERMINATION_MESSAGE)
         {
             SocketTools_ReadMessage(ChParams_s.accepted_sock, &ChParams_s.message);
-            //randomly_flip_msg_bits(CHANNEL_REC_BUF, seed, prob); 
+            ChannelUtils_AddNoiseToMessage();
             //SocketTools_SendMessage(ChParams_s.server_sock, ChParams_s.message);
         }
         

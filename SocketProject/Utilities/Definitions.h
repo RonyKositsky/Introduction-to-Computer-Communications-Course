@@ -25,6 +25,7 @@
 #define TERMINATION_MESSAGE (0x80000000) // Bit 31 is on.
 #define QUIT				(0xC0000000) // Bit 31 & 30 are on.
 #define CONTINUE			(0xE0000000) // Bit 31 & 30 & 29 are on.
+#define FILE_NAME_BUFFER    2048
 
 typedef enum
 {
