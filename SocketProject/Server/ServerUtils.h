@@ -11,16 +11,29 @@
 /************************************
 *      include                      *
 ************************************/
-
+#include <WinSock2.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 /************************************
 *      definitions                 *
 ************************************/
-#define QUIT (-1)
+
 /************************************
 *       types                       *
 ************************************/
+typedef struct
+{
+	SOCKET socket;
+	SOCKET accepted_socket;
+	FILE* file;
+	uint32_t message;
+	uint32_t messageHamming;
+	bool quit;
+}ServerParams;
 
+extern ServerParams ServerParams_s;
 
 /************************************
 *       API                         *
@@ -47,17 +60,17 @@ void ServerUtils_ServerTearDown();
 /*!
 ******************************************************************************
 \brief
- Waiting to recieve new message.
-\return QUIT if we want to finish sequence. Else, new message.
-*****************************************************************************/
-void ServerUtils_WaitForMessage();
-
-/*!
-******************************************************************************
-\brief
  Handeling new received message.
 \return none
 *****************************************************************************/
 void ServerUtils_HandleMessage(int bytesRecived);
+
+/*!
+******************************************************************************
+\brief
+ Initializing new server session.
+\return none
+*****************************************************************************/
+void ServerUtils_SessionInit();
 
 #endif //__SERVER_UTILSw_H__

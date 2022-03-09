@@ -40,8 +40,7 @@ void ChannelUtils_ReadInput(char* argv[])
     ChParams_s.sender_ip = "127.0.0.1";
     ChParams_s.sender_port = 6342;
 
-    //ChParams_s.sender_ip = "127.0.0.1";
-    //ChParams_s.sender_port = 6343;
+    ChannelUtils_InitSession();
 }
 
 /*!
@@ -59,38 +58,6 @@ void ChannelUtils_ChannelInit(char* argv[])
     memset(&ChArgs_s, 0, sizeof(ChannelArguments));
 
     ChannelUtils_ReadInput(argv);
-
-    //channel as server (recieves messages from the sender)
-    ChParams_s.sender_sock = SocketTools_CreateSocket(ChParams_s.sender_ip, ChParams_s.sender_port, SERVER);
-
-    // channel as sender (sends messages to the server)
-    //ChParams_s.server_sock = SocketTools_CreateSocket();
-    //SocketTools_CreateAddress(&ChParams_s.server_sock, ChParams_s.server_ip, ChParams_s.server_port, CLIENT);
-}
-
-/*!
-******************************************************************************
-\brief
-Preparing channel read massage that was sent.
-\return none
-*****************************************************************************/
-void ChannelUtils_ReadMsgFromSender()
-{
-    uint32_t rm;
-    SOCKET s = accept(ChParams_s.sender_sock, NULL, NULL);
-    int status = recv(s, &rm, sizeof(uint32_t), 0);
-    ChParams_s.message = ntohl(rm);
-}
-
-/*!
-******************************************************************************
-\brief
-Preparing channel to writing massage.
-\return none
-*****************************************************************************/
-void ChannelUtils_SendMsgToServer()
-{
-   
 }
 
 /*!
@@ -101,7 +68,6 @@ Tearing down the channel.
 *****************************************************************************/
 void ChannelUtils_ChannelTearDown()
 {
-    ChannelUtils_ReadMsgFromSender();
     closesocket(ChParams_s.server_sock);
     closesocket(ChParams_s.sender_sock);
 
@@ -109,4 +75,22 @@ void ChannelUtils_ChannelTearDown()
      
     //char* sender_ip_str = inet_ntoa((ChParams.sender_addr)->sin_addr);
     //print_channel_output(ChArgs.server_ip, sender_ip_str);
+}
+
+/*!
+******************************************************************************
+\brief
+Initializing new session.
+\return none
+*****************************************************************************/
+void ChannelUtils_InitSession()
+{
+    // TODO: handle errors.
+    // 
+    //channel as server (recieves messages from the sender)
+    ChParams_s.sender_sock = SocketTools_CreateSocket(ChParams_s.sender_ip, ChParams_s.sender_port, SERVER);
+    ChParams_s.accepted_sock = accept(ChParams_s.sender_sock, NULL, NULL);
+
+    // channel as sender (sends messages to the server)
+    //ChParams_s.server_sock = SocketTools_CreateSocket();
 }

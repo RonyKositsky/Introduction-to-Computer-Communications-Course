@@ -28,17 +28,11 @@ typedef struct
 {
 	char* ip;
 	int port;
-	char filename[MAX_LIMIT];
-	char filename2[MAX_LIMIT];
 }SenderArguments;
-
 
 /************************************
 *      variables                 *
 ************************************/
-static char SEND_BUF[MAX_BUFFER];
-static char REC_BUF[MAX_BUFFER];
-static int send_buf_cur_ind;
 static SenderArguments SenderArgs_s;
 SenderParams SenderParams_s;
 
@@ -71,8 +65,6 @@ void SenderUtils_SenderInit(char* argv[])
 
 	SenderArgs_s.ip = "127.0.0.1";
 	SenderArgs_s.port = 6342;
-
-//	SenderParams_s.socket = SocketTools_CreateSocket(SenderArgs_s.ip, SenderArgs_s.port, CLIENT);
 }
 
 
@@ -101,21 +93,16 @@ Tear down our sender.
 *****************************************************************************/
 void SenderUtils_SenderTearDown()
 {	
-	//SocketTools_ReadMessage(&readMessage);
-	
 	// Closing.
 	SenderUtils_PrintOutput();
-	int a = shutdown(SenderParams_s.socket, SD_SEND);
-	int b = closesocket(SenderParams_s.socket);
+	closesocket(SenderParams_s.socket);
 	fclose(SenderParams_s.file);
 }
 
 void SenderUtils_AddHammCode()
 {
-	SenderParams_s.socket = SocketTools_CreateSocket(SenderArgs_s.ip, SenderArgs_s.port, CLIENT);
 	uint32_t message = SenderUtils_ConvertMessageToUint(SenderParams_s.msg_buffer);
 	SenderParams_s.messageHamming = BitTools_GetMassageWithHamming(message);
-	//SenderParams_s.messageHamming = 100;
 }
 
 void SenderUtils_OpenFile()
@@ -125,6 +112,21 @@ void SenderUtils_OpenFile()
 	//scanf("%s", SenderArgs_s.filename);
 	strcpy(SenderArgs_s.filename, "C:\\GitUni\\Introduction-to-Computer-Communications-Course\\file.txt");
 	SenderParams_s.file = fopen(SenderArgs_s.filename, "rb");
+	
+	//TODO: IF "quit" quit = 1;
+}
+
+/*!
+******************************************************************************
+\brief
+Initialize sender new session.
+\return none
+*****************************************************************************/
+void SenderUtils_InitSession()
+{
+	SenderUtils_OpenFile();
+	if (SenderParams_s.quit) return;
+	SenderParams_s.socket = SocketTools_CreateSocket(SenderArgs_s.ip, SenderArgs_s.port, CLIENT);
 }
 
 /************************************

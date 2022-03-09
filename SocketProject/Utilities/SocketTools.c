@@ -12,13 +12,7 @@
 ************************************/
 #include "SocketTools.h"
 #include <stdio.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/timeb.h>
 #include <winsock2.h>
-#include <conio.h>
-#include <ws2tcpip.h>
 
 /************************************
 *       API implementation          *
@@ -55,6 +49,8 @@ SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType type)
 	sa.sin_port = htons(port);
 	sa.sin_addr.s_addr = inet_addr(ip);
 
+
+	// TODO: Error handling.
 	if (type == CLIENT)
 	{
 		status = connect(sockfd, (SOCKADDR*)&sa, sizeof(struct sockaddr));
@@ -68,8 +64,6 @@ SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType type)
 	return sockfd;
 }
 
-
-
 /*!
 ******************************************************************************
 \brief
@@ -81,8 +75,9 @@ Reading message via socket.
 int SocketTools_ReadMessage(SOCKET socket, uint32_t *message)
 {
 	uint32_t rm = 0;
-	int status = read(socket, &rm, sizeof(uint32_t), MSG_PEEK );
+	int status = recv(socket, &rm, sizeof(uint32_t), 0 );
 	*message = ntohl(rm);
+	return status;
 }
 
 /*!
@@ -97,6 +92,29 @@ int SocketTools_SendMessage(SOCKET socket, uint32_t message)
 {
 	uint32_t un = htonl(message);
 	int status = send(socket, &un, sizeof(uint32_t), 0);
+	return status;
+}
+
+/*!
+******************************************************************************
+\brief
+Terminating the program.
+\return the number of bits sent.
+*****************************************************************************/
+int SocketTools_SendQuit(SOCKET socket)
+{
+	return SocketTools_SendMessage(socket, QUIT);
+}
+
+/*!
+******************************************************************************
+\brief
+Sending continue session for another file.
+\return the number of bits sent.
+*****************************************************************************/
+int SocketTools_SendContinue(SOCKET socket)
+{
+	return SocketTools_SendMessage(socket, CONTINUE);
 }
 
 

@@ -11,6 +11,7 @@
 /************************************
 *      include                      *
 ************************************/
+#include <stdbool.h>
 #include <winsock2.h>
 #include "../Utilities/SocketTools.h"
 
@@ -22,10 +23,12 @@ typedef struct
 	uint32_t message;
 	SOCKET server_sock;
 	SOCKET sender_sock;
+	SOCKET accepted_sock;
 	char* sender_ip;
 	char* server_ip;
 	int sender_port;
 	int server_port;
+	bool quit;
 }ChannelParams;
 
 /************************************
@@ -47,21 +50,14 @@ Initialize the channel.
 *****************************************************************************/
 void ChannelUtils_ChannelInit(char* argv[]);
 
-/*!
-******************************************************************************
-\brief
-Preparing channel read massage that was sent.
-\return none
-*****************************************************************************/
-void ChannelUtils_ReadMsgFromSender();
 
 /*!
 ******************************************************************************
 \brief
-Preparing channel to writing massage.
+Initializing new session.
 \return none
 *****************************************************************************/
-void ChannelUtils_SendMsgToServer();
+void ChannelUtils_InitSession();
 
 /*!
 ******************************************************************************

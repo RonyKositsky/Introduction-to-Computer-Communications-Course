@@ -12,6 +12,7 @@
 #include <winsock2.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 /************************************
 *       types                       *
@@ -20,10 +21,10 @@ typedef struct
 {
 	SOCKET socket;
 	FILE* file;
-	struct sockaddr_in channel_addr;
-	char msg_buffer[MSG_SIZE];
 	uint32_t message;
 	uint32_t messageHamming;
+	char msg_buffer[MSG_SIZE];
+	bool quit;
 }SenderParams;
 
 extern SenderParams SenderParams_s;
@@ -66,8 +67,20 @@ Tear down our sender.
 *****************************************************************************/
 void SenderUtils_SenderTearDown();
 
+/*!
+******************************************************************************
+\brief
+Getting file name from the user.
+\return none
+*****************************************************************************/
 void SenderUtils_OpenFile();
 
-SenderUtils_SendTerminationMessage();
+/*!
+******************************************************************************
+\brief
+Initialize sender new session.
+\return none
+*****************************************************************************/
+void SenderUtils_InitSession();
 
 #endif //__SENDER_UTILS_H__

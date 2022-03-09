@@ -16,10 +16,6 @@
 #include "Definitions.h"
 
 /************************************
-*       types                       *
-************************************/
-
-/************************************
 *       API                         *
 ************************************/
 
@@ -31,16 +27,16 @@ Initializing new socket.
 *****************************************************************************/
 SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType type);
 
-
 /*!
 ******************************************************************************
 \brief
 Reading message via socket.
 \param
- [in] msgVars - The message arguments struct.
+ [in] socket    - The socket we are reading from.
+ [in] message_p - Pointer to the message we will save the message to.
 \return the number of bits recieved.
 *****************************************************************************/
-int SocketTools_ReadMessage(SOCKET socket, uint32_t *message);
+int SocketTools_ReadMessage(SOCKET socket, uint32_t *message_p);
 
 /*!
 ******************************************************************************
@@ -51,5 +47,23 @@ Sending message via socket.
 \return the number of bits sent.
 *****************************************************************************/
 int SocketTools_SendMessage(SOCKET socket, uint32_t message);
+
+/*!
+******************************************************************************
+\brief
+Terminating the program.
+\param
+ [in] socket - The socket we will send the data.
+\return the number of bits sent.
+*****************************************************************************/
+int SocketTools_SendQuit(SOCKET socket);
+
+/*!
+******************************************************************************
+\brief
+Sending continue session for another file.
+\return the number of bits sent.
+*****************************************************************************/
+int SocketTools_SendContinue(SOCKET socket);
 
 #endif //__SOCKET_TOOLS_H__

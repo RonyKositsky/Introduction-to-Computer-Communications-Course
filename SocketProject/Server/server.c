@@ -10,29 +10,33 @@
 *      include                      *
 ************************************/
 #include "ServerUtils.h"
+#include "../Utilities/Definitions.h"
 
 /************************************
 *			Main	                *
 ************************************/
-int main(int argc, char* argv[]){
-	
-	int bytesRecived;
+int main(int argc, char* argv[])
+{
 	ServerUtils_ServerInit(argv);
-	while (1)
+	while (!ServerParams_s.quit)
 	{
-		//bytesRecived = ServerUtils_WaitForMessage();
-		//if (bytesRecived == QUIT)
-		//{
-		//	// TODO: Implement quit.
-		//	break;
-		//} 
-		//else 
-		//{
-		//	ServerUtils_HandleMessage(bytesRecived);
-		//}
-		ServerUtils_WaitForMessage();
+		while (ServerParams_s.messageHamming != TERMINATION_MESSAGE)
+		{
+
+		}
+
+		SocketTools_ReadMessage(ServerParams_s.accepted_socket, &ServerParams_s.messageHamming);
+		closesocket(ServerParams_s.accepted_socket);
+		closesocket(ServerParams_s.socket);
+
+		if (ServerParams_s.messageHamming == QUIT)
+		{
+			ServerUtils_ServerTearDown();
+			break;
+		}
+
+		ServerUtils_SessionInit();
 	}
 
-	ServerUtils_ServerTearDown();
 	return 0;
 }
