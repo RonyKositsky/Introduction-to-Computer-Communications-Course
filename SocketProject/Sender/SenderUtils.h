@@ -21,11 +21,11 @@ typedef struct
 {
 	SOCKET socket;
 	FILE* file;
-	uint32_t message;
-	uint32_t messageHamming;
 	char msg_buffer[MSG_SIZE];
 	char filename[FILE_NAME_BUFFER];
 	bool quit;
+	int message_size;
+	char* sent_message;
 }SenderParams;
 
 extern SenderParams SenderParams_s;
@@ -47,26 +47,10 @@ void SenderUtils_SenderInit(char* argv[]);
 /*!
 ******************************************************************************
 \brief
-Adding hamming code to the message we have read.
-\return none
-*****************************************************************************/
-void SenderUtils_AddHammCode();
-
-/*!
-******************************************************************************
-\brief
 Reading from the input file the next 26 bits.
 \return Number of bits read.
 *****************************************************************************/
-int SenderUtils_ReadBytesFromFile();
-
-/*!
-******************************************************************************
-\brief
-Tear down our sender.
-\return none
-*****************************************************************************/
-void SenderUtils_SenderTearDown();
+void  SenderUtils_ReadingFile();
 
 /*!
 ******************************************************************************
@@ -83,5 +67,13 @@ Initialize sender new session.
 \return none
 *****************************************************************************/
 void SenderUtils_InitSession();
+
+/*!
+******************************************************************************
+\brief
+Printing statistics and relevant data.
+\return none
+*****************************************************************************/
+void SenderUtils_PrintOutput();
 
 #endif //__SENDER_UTILS_H__

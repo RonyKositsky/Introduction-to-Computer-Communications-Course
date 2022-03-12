@@ -10,14 +10,10 @@
 *      include                      *
 ************************************/
 #include "ServerUtils.h"
-#include <WinSock2.h>
-#include <stdio.h>
-#include <stdint.h>
 #include <math.h>
 #include "../Utilities/Definitions.h"
 #include "../Utilities/SocketTools.h"
 #include "../Utilities/BitTools.h"
-#include "../Sender/SenderUtils.h"
 
 /************************************
 *       types                       *
@@ -45,9 +41,8 @@ ServerParams ServerParams_s;
 /************************************
 *      static functions             *
 ************************************/
-static void ServerUtils_PrintOutput();
 void SenderUtils_OpenFile();
-static uint32_t ServerUtils_StripHammingCode(uint32_t message);
+static uint32_t ServerUtils_StripHammingCode(uint32_t message_size);
 
 /************************************
 *       API implementation          *
@@ -71,37 +66,62 @@ void ServerUtils_ServerInit(char* argv[])
 	ServerArgs_s.ip = argv[1];
 	ServerArgs_s.port = atoi(argv[2]);
 
-	SenderUtils_InitSession();
+	ServerUtils_SessionInit();
 }
 
 /*!
 ******************************************************************************
 \brief
-Teardown the server.
+Printing relevant data and statistics.
 \return none
 *****************************************************************************/
-void ServerUtils_ServerTearDown()
+void ServerUtils_WriteToFile()
 {
-	closesocket(ServerParams_s.socket);
-	fclose(ServerParams_s.file);
-	ServerUtils_PrintOutput();
-}
-
-/*!
-******************************************************************************
-\brief
- Handeling new received message.
-\return none
-*****************************************************************************/
-void ServerUtils_HandleMessage(int bytesRecived)
-{
-	if (ServerParams_s.file == NULL)
+	int index = 0;
+	char bit;
+	uint32_t msg, recovered_message;
+	char buf[HAMM_MSG_SIZE] = {0};
+	while (index < (int)ServerParams_s.message_size)
 	{
-	//	ServerParams_s.file = fopen(ServerArgs_s.filename, "wb");
+		// Get message as uint.
+		for (size_t i = 0; i < HAMM_MSG_SIZE; i++)
+		{
+			buf[i] = ServerParams_s.message[index];
+			index++;
+		}
+
+		// remove noise.
+		msg = BitTools_ConvertStringToUint(buf, false);
+		recovered_message = ServerUtils_StripHammingCode(msg);
+
+		// Add to sent buffer.
+		int j = 0;
+		for (int i = 0; i < HAMM_MSG_SIZE; i++)
+		{
+			if (HammingPairingBitsIndexes[j] == i)
+			{
+				j++;
+				continue;
+			}
+			bit = BitTools_GetNBit(recovered_message, i);
+			fputs(&bit, ServerParams_s.file);
+		}
 	}
 
-	// TODO: Make sure if we need to write it to file.
-	//write_msg_to_file(file, parsed_msg);
+	fclose(ServerParams_s.file);
+}
+
+/*!
+******************************************************************************
+\brief
+Printing relevant data and statistics.
+\return none
+*****************************************************************************/
+void ServerUtils_PrintOutput()
+{
+	fprintf(stderr, "Received: %d bytes\n", ServerOutParams_s.BytesRecieved);
+	fprintf(stderr, "Wrote: %d bytes\n", ServerOutParams_s.BytesWritten);
+	fprintf(stderr, "Detected and corrected %d errors\n", ServerOutParams_s.FramesFixed);
 }
 
 /************************************
@@ -111,28 +131,16 @@ void ServerUtils_HandleMessage(int bytesRecived)
 /*!
 ******************************************************************************
 \brief
-Printing relevant data and statistics.
-\return none
-*****************************************************************************/
-static void ServerUtils_PrintOutput()
-{
-	fprintf(stderr, "Received: %d bytes\n", ServerOutParams_s.BytesRecieved);
-	fprintf(stderr, "Wrote: %d bytes\n", ServerOutParams_s.BytesWritten);
-	fprintf(stderr, "Detected and corrected %d errors\n", ServerOutParams_s.FramesFixed);
-}
-
-/*!
-******************************************************************************
-\brief
 Returns the message without the hamming code. Making corrections if possible.
 \return Message to be written.
 *****************************************************************************/
-uint32_t ServerUtils_StripHammingCode(uint32_t message)
+uint32_t ServerUtils_StripHammingCode(uint32_t msg)
 {
-	uint32_t ret = message;
-	uint32_t paitiy = BitTools_BitwiseXOR(message);
+	uint32_t paitiy = BitTools_BitwiseXOR(msg);
 	if (!paitiy) // No error.
-		return ret;
+		return msg;
+
+	uint32_t ret = msg;
 
 	// TODO: If we have 2+ errors.
 	
@@ -142,11 +150,10 @@ uint32_t ServerUtils_StripHammingCode(uint32_t message)
 	int index = 0;
 	for (int j = HAMM_PAIRITY_BITS - 1; j >= 0; j--)
 	{
-		uint32_t masked = message & HammingMasks[j];
-		uint32_t newPairity = BitTools_BitwiseXOR(masked);
-		if (newPairity != CHECK_BIT(message, HammingPairingBitsIndexes[j]))
+		uint32_t masked = msg & HammingMasksCehcks[j];
+		if (BitTools_BitwiseXOR(masked) != 0)
 		{
-			index += (int)pow(2,i);
+			index += (int)pow(2,i) - 1;
 		}
 		i++;
 	}
@@ -160,7 +167,7 @@ void SenderUtils_OpenFile()
 	//TODO: Handle errors, quit.
 	printf("File name:");
 	//scanf("%s", SenderArgs_s.filename);
-	char filename[1000];
+	char filename[FILE_NAME_BUFFER];
 	strcpy(filename, "C:\\GitUni\\Introduction-to-Computer-Communications-Course\\res.txt");
 	ServerParams_s.file = fopen(filename, "wb");
 }

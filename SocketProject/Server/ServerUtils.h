@@ -17,10 +17,6 @@
 #include <stdbool.h>
 
 /************************************
-*      definitions                 *
-************************************/
-
-/************************************
 *       types                       *
 ************************************/
 typedef struct
@@ -28,9 +24,10 @@ typedef struct
 	SOCKET socket;
 	SOCKET accepted_socket;
 	FILE* file;
-	uint32_t message;
+	uint32_t message_size;
 	uint32_t messageHamming;
 	bool quit;
+	char* message;
 }ServerParams;
 
 extern ServerParams ServerParams_s;
@@ -52,25 +49,25 @@ void ServerUtils_ServerInit(char* argv[]);
 /*!
 ******************************************************************************
 \brief
-Teardown the server.
-\return none
-*****************************************************************************/
-void ServerUtils_ServerTearDown();
-
-/*!
-******************************************************************************
-\brief
- Handeling new received message.
-\return none
-*****************************************************************************/
-void ServerUtils_HandleMessage(int bytesRecived);
-
-/*!
-******************************************************************************
-\brief
  Initializing new server session.
 \return none
 *****************************************************************************/
 void ServerUtils_SessionInit();
+
+/*!
+******************************************************************************
+\brief
+Printing relevant data and statistics.
+\return none
+*****************************************************************************/
+void ServerUtils_PrintOutput();
+
+/*!
+******************************************************************************
+\brief
+Printing relevant data and statistics.
+\return none
+*****************************************************************************/
+void ServerUtils_WriteToFile();
 
 #endif //__SERVER_UTILSw_H__

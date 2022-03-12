@@ -12,6 +12,7 @@
 ************************************/
 #include "Definitions.h"
 #include <stdint.h>
+#include <stdbool.h>
 
 /************************************
 *      defines                      *
@@ -42,6 +43,16 @@ static int HammingMasks[HAMM_PAIRITY_BITS] =
 	FIFTH_PAIRITY_MASK, 
 };
 
+static int HammingMasksCehcks[HAMM_PAIRITY_BITS] =
+{
+	FIRST_PAIRITY_MASK_CHECK,
+	SECOND_PAIRITY_MASK_CHECK,
+	THIRD_PAIRITY_MASK_CHECK,
+	FOURTH_PAIRITY_MASK_CHECK,
+	FIFTH_PAIRITY_MASK_CHECK,
+};
+
+
 /************************************
 *       API                         *
 ************************************/
@@ -49,18 +60,10 @@ static int HammingMasks[HAMM_PAIRITY_BITS] =
 /*!
 ******************************************************************************
 \brief
-Initializing new socket.
-\return SOCKET.
-*****************************************************************************/
-void BitTools_GetMessageBits(char msg[2], char* bits, int size);
-
-/*!
-******************************************************************************
-\brief
 Adding to recieved message 5 pairity bits.
 \return Message with uninitialized hamming code.
 *****************************************************************************/
-uint32_t BitTools_ConvertStringToUint(char *massage);
+uint32_t BitTools_ConvertStringToUint(char *massage, bool hammingAddition);
 
 /*!
 ******************************************************************************
@@ -77,5 +80,7 @@ Adding to recieved message 5 pairity bits.
 \return Message with uninitialized hamming code.
 *****************************************************************************/
 int BitTools_BitwiseXOR(uint32_t num);
+
+char BitTools_GetNBit(uint32_t num, int n);
 
 #endif //__BIT_TOOLS_H__

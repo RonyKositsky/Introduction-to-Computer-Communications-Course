@@ -26,7 +26,9 @@ typedef enum
 
 typedef struct
 {
-	uint32_t message;
+	uint32_t message_size;
+	char* message;
+	char* message_sent;
 	SOCKET server_sock;
 	SOCKET sender_sock;
 	SOCKET accepted_sock;
@@ -57,7 +59,6 @@ Initialize the channel.
 *****************************************************************************/
 void ChannelUtils_ChannelInit(int argc, char* argv[]);
 
-
 /*!
 ******************************************************************************
 \brief
@@ -69,10 +70,10 @@ void ChannelUtils_InitSession();
 /*!
 ******************************************************************************
 \brief
-Tearing down the channel.
+Adding noise to recieved message.
 \return none
 *****************************************************************************/
-void ChannelUtils_ChannelTearDown();
+void ChannelUtils_AddNoiseToMessage();
 
 /*!
 ******************************************************************************
@@ -80,6 +81,14 @@ void ChannelUtils_ChannelTearDown();
 Adding noise to recieved message.
 \return none
 *****************************************************************************/
-void ChannelUtils_AddNoiseToMessage();
+void ChannelUtils_AskToContinue();
+
+/*!
+******************************************************************************
+\brief
+Adding noise to recieved message.
+\return none
+*****************************************************************************/
+void ChannelUtils_PrintStatistics();
 
 #endif //__CHANNEL_UTILS_H__

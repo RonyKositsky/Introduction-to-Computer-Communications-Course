@@ -22,20 +22,18 @@ int main(int argc, char* argv[])
 
 	while (!SenderParams_s.quit)
 	{
-		// As said, we can assume that we will get blocks of MSG_SIZE.
-		while (SenderUtils_ReadBytesFromFile() == MSG_SIZE)
-		{
-			SenderUtils_AddHammCode();
-			SocketTools_SendMessage(SenderParams_s.socket, SenderParams_s.messageHamming);
-		}
+		SenderUtils_ReadingFile();
 
-		SocketTools_SendMessage(SenderParams_s.socket, TERMINATION_MESSAGE);
+		SocketTools_SendMessageSize(SenderParams_s.socket, SenderParams_s.message_size);
+		SocketTools_SendMessage(SenderParams_s.socket, SenderParams_s.sent_message, SenderParams_s.message_size);
+
 		closesocket(SenderParams_s.socket);
+		free(SenderParams_s.sent_message);
+
+		SenderUtils_PrintOutput();
 		SenderUtils_InitSession();
-		SenderParams_s.quit = true;
 	}
-	SocketTools_SendMessage(SenderParams_s.socket, QUIT);
-	SenderUtils_SenderTearDown();
+
 	return 0;
 }
 

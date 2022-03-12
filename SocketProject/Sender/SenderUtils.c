@@ -12,10 +12,10 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "SenderUtils.h"
 #include "../Utilities/SocketTools.h"
 #include "../Utilities/BitTools.h"
-
 /************************************
 *      definitions                 *
 ************************************/
@@ -39,8 +39,8 @@ SenderParams SenderParams_s;
 /************************************
 *      static functions             *
 ************************************/
-static void SenderUtils_PrintOutput();
-static uint32_t SenderUtils_ConvertMessageToUint(char* massage);
+static void SenderUtils_GetMessageSize();
+static void SenderUtils_AddHammCode();
 
 /************************************
 *       API implementation          *
@@ -63,10 +63,11 @@ void SenderUtils_SenderInit(char* argv[])
 	/*SenderArgs_s.ip = argv[1];
 	SenderArgs_s.port = atoi(argv[2]);*/
 
+	SenderUtils_InitSession();
+
 	SenderArgs_s.ip = "127.0.0.1";
 	SenderArgs_s.port = 6342;
 }
-
 
 /*!
 ******************************************************************************
@@ -74,35 +75,11 @@ void SenderUtils_SenderInit(char* argv[])
 Reading from the input file the next 26 bits.
 \return Number of bits read.
 *****************************************************************************/
-int SenderUtils_ReadBytesFromFile()
+void SenderUtils_ReadingFile()
 {
-	int err = fread(SenderParams_s.msg_buffer, 1, MSG_SIZE, SenderParams_s.file);
-	if (err < 0)
-	{
-		fprintf(stderr, "Read from file failed.\n");
-		exit(-1);
-	}
-	return err;
-}
-
-/*!
-******************************************************************************
-\brief
-Tear down our sender.
-\return none
-*****************************************************************************/
-void SenderUtils_SenderTearDown()
-{	
-	// Closing.
-	SenderUtils_PrintOutput();
-	closesocket(SenderParams_s.socket);
+	SenderUtils_GetMessageSize();
+	SenderUtils_AddHammCode();
 	fclose(SenderParams_s.file);
-}
-
-void SenderUtils_AddHammCode()
-{
-	uint32_t message = SenderUtils_ConvertMessageToUint(SenderParams_s.msg_buffer);
-	SenderParams_s.messageHamming = BitTools_GetMassageWithHamming(message);
 }
 
 void SenderUtils_OpenFile()
@@ -129,9 +106,6 @@ void SenderUtils_InitSession()
 	SenderParams_s.socket = SocketTools_CreateSocket(SenderArgs_s.ip, SenderArgs_s.port, CLIENT);
 }
 
-/************************************
-* static implementation             *
-************************************/
 
 /*!
 ******************************************************************************
@@ -139,11 +113,15 @@ void SenderUtils_InitSession()
 Printing statistics and relevant data.
 \return none
 *****************************************************************************/
-static void SenderUtils_PrintOutput()
+void SenderUtils_PrintOutput()
 {
-	//TODO
+	//TODO: Implement
 }
 
+
+/************************************
+* static implementation             *
+************************************/
 
 /*!
 ******************************************************************************
@@ -151,40 +129,61 @@ static void SenderUtils_PrintOutput()
 Adding to recieved message 5 pairity bits.
 \return Message with uninitialized hamming code.
 *****************************************************************************/
-uint32_t SenderUtils_ConvertMessageToUint(char* massage)
+uint32_t BitTools_GetMassageWithHamming(uint32_t message_size)
 {
-	uint32_t val = 0;
-	int i = 0;
-	if (massage == NULL)
-		return 0;
-
-	while (massage[i] == '0' || massage[i] == '1')
-	{
-		val <<= 1;
-		val += massage[i] - '0';
-		i++;
-	}
-
-	return val;
-}
-
-/*!
-******************************************************************************
-\brief
-Adding to recieved message 5 pairity bits.
-\return Message with uninitialized hamming code.
-*****************************************************************************/
-uint32_t BitTools_GetMassageWithHamming(uint32_t message)
-{
-	uint32_t hammeingMessage = message;
+	uint32_t hammeingMessage = message_size;
 	for (int i = 0; i < HAMM_PAIRITY_BITS; i++)
 	{
-		uint32_t masked = message & HammingMasks[i];
+		uint32_t masked = message_size & HammingMasks[i];
 		uint32_t pairity = BitTools_BitwiseXOR(masked);
 		
 		// Set to 1 if pairity is 1, otherwise the default is 0 so we don't need to change it.
 		if (!pairity) continue;
-		BIT_SET(message, HammingMasks[i]);
+		BIT_SET(message_size, HammingMasks[i]);
 	}
 	return hammeingMessage;
+}
+
+
+static void SenderUtils_GetMessageSize()
+{
+	size_t err, message_chunks = 0;
+	// As said, we can assume that we will get blocks of MSG_SIZE.
+	while (err = fread(SenderParams_s.msg_buffer, 1, MSG_SIZE, SenderParams_s.file))
+	{
+		if (err < 0)
+		{
+			fprintf(stderr, "Read from file failed.\n");
+			exit(-1);
+		}
+
+		message_chunks++;
+	}
+
+	rewind(SenderParams_s.file);
+	SenderParams_s.message_size = (int)message_chunks * HAMM_MSG_SIZE;
+	SenderParams_s.sent_message = (char*)malloc(SenderParams_s.message_size * sizeof(char));
+}
+
+static void SenderUtils_AddHammCode()
+{
+	size_t err, index = 0;
+	uint32_t message_size, messageHamming;
+	while (err = fread(SenderParams_s.msg_buffer, 1, MSG_SIZE, SenderParams_s.file))
+	{
+		if (err < 0)
+		{
+			fprintf(stderr, "Read from file failed.\n");
+			exit(-1);
+		}
+
+		message_size   = BitTools_ConvertStringToUint(SenderParams_s.msg_buffer, true);
+		messageHamming = BitTools_GetMassageWithHamming(message_size);
+
+		for (int i = 0; i < HAMM_MSG_SIZE; i++)
+		{
+			SenderParams_s.sent_message[index] = BitTools_GetNBit(messageHamming, i);
+			index ++;
+		}
+	}	
 }

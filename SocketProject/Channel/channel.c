@@ -23,23 +23,26 @@ int main(int argc, char* argv[])
 
     while (!ChParams_s.quit)
     {
-        while (ChParams_s.message == TERMINATION_MESSAGE)
-        {
-            SocketTools_ReadMessage(ChParams_s.accepted_sock, &ChParams_s.message);
-            ChannelUtils_AddNoiseToMessage();
-            //SocketTools_SendMessage(ChParams_s.server_sock, ChParams_s.message);
-        }
-        
-        SocketTools_ReadMessage(ChParams_s.accepted_sock, &ChParams_s.message);
-        closesocket(ChParams_s.accepted_sock);
+        // Getting message size.
+        SocketTools_ReadMessageSize(ChParams_s.accepted_sock, &ChParams_s.message_size);
+        SocketTools_SendMessageSize(ChParams_s.server_sock, ChParams_s.message_size);
 
-        if (ChParams_s.message == QUIT)
-        {
-            SocketTools_SendQuit(ChParams_s.server_sock);
-            ChParams_s.quit = true;
-        }      
+        // Reading message.
+        ChParams_s.message = (char*)malloc(ChParams_s.message_size * sizeof(char));
+        SocketTools_ReadMessage(ChParams_s.accepted_sock, ChParams_s.message, ChParams_s.message_size);
+        ChannelUtils_AddNoiseToMessage();
+
+        // Sending noisy message.
+        //SocketTools_SendMessage(ChParams_s.server_sock, ChParams_s.message, ChParams_s.message_size);
+        
+        // Closing current procedure.
+        SocketTools_ReadMessageSize(ChParams_s.accepted_sock, &ChParams_s.message_size);
+        closesocket(ChParams_s.accepted_sock);
+        free(ChParams_s.message);
+
+        // Print
+        ChannelUtils_AskToContinue();
     }
     
-    ChannelUtils_ChannelTearDown();
     return 0;
 }

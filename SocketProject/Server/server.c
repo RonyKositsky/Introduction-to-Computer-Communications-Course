@@ -11,6 +11,7 @@
 ************************************/
 #include "ServerUtils.h"
 #include "../Utilities/Definitions.h"
+#include "../Utilities/SocketTools.h"
 
 /************************************
 *			Main	                *
@@ -20,21 +21,21 @@ int main(int argc, char* argv[])
 	ServerUtils_ServerInit(argv);
 	while (!ServerParams_s.quit)
 	{
-		while (ServerParams_s.messageHamming != TERMINATION_MESSAGE)
-		{
+		// Get message size.
+		SocketTools_ReadMessageSize(ServerParams_s.accepted_socket, &ServerParams_s.message_size);
 
-		}
+		// Read message.
+		ServerParams_s.message = (char*)malloc(ServerParams_s.message_size * sizeof(char));
+		SocketTools_ReadMessage(ServerParams_s.accepted_socket, ServerParams_s.message ,ServerParams_s.message_size);
 
-		SocketTools_ReadMessage(ServerParams_s.accepted_socket, &ServerParams_s.messageHamming);
+		// Write to file.
+		ServerUtils_WriteToFile();
+
+		// Closing procedure.
 		closesocket(ServerParams_s.accepted_socket);
 		closesocket(ServerParams_s.socket);
-
-		if (ServerParams_s.messageHamming == QUIT)
-		{
-			ServerUtils_ServerTearDown();
-			break;
-		}
-
+		
+		ServerUtils_PrintOutput();
 		ServerUtils_SessionInit();
 	}
 

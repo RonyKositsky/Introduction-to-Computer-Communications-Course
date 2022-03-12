@@ -9,35 +9,15 @@
 *      include                      *
 ************************************/
 #include "BitTools.h"
-#include <stdint.h>
+
 /************************************
 *      functions                    *
 ************************************/
-static char BitTools_GetBitAsChar(char c, int i)
-{
-	//TODO: Make sure if it is correct for our coding type.
-	return ((1 << (7 - i)) & c) != 0;
-}
 
 /************************************
 *       API implementation          *
 ************************************/
-void BitTools_GetMessageBits(char msg[2], char* bits, int size)
-{
-	//TODO: Refactor.
 
-	unsigned char cur = msg[0];
-	for (int i = 0; i < size; i++)
-	{
-		int ind = i;
-		if (i > 7) 
-		{
-			cur = msg[1];
-			ind = i - 8;
-		}
-		bits[i] = BitTools_GetBitAsChar(cur, ind);
-	}
-}
 
 /*!
 ******************************************************************************
@@ -45,17 +25,28 @@ void BitTools_GetMessageBits(char msg[2], char* bits, int size)
 Adding to recieved message 5 pairity bits.
 \return Message with uninitialized hamming code.
 *****************************************************************************/
-uint32_t BitTools_ConvertStringToUint(char* massage)
+uint32_t BitTools_ConvertStringToUint(char* massage, bool hammingAddition)
 {
 	uint32_t val = 0; 
 	int i = 0;
+	int hamming_index = 0;
+
 	if (massage == NULL)
 		return 0;
 
 	while (massage[i] == '0' || massage[i] == '1')
 	{  
 		val <<= 1;
-		val += massage[i] - '0';
+		
+		if (hammingAddition && i == HammingPairingBitsIndexes[hamming_index])
+		{
+			hamming_index++;
+		}
+		else
+		{
+			val += massage[i] - '0';
+		}
+
 		i++;
 	}
 
@@ -93,6 +84,11 @@ int BitTools_BitwiseXOR(uint32_t num)
 	}
 
 	return pairity;
+}
+
+char BitTools_GetNBit(uint32_t num, int n)
+{
+	return  (char)(((1 << n) - 1) & num);
 }
 
 

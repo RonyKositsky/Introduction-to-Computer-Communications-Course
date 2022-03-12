@@ -36,7 +36,7 @@ Reading message via socket.
  [in] message_p - Pointer to the message we will save the message to.
 \return the number of bits recieved.
 *****************************************************************************/
-int SocketTools_ReadMessage(SOCKET socket, uint32_t *message_p);
+void SocketTools_ReadMessageSize(SOCKET socket, uint32_t *message_p);
 
 /*!
 ******************************************************************************
@@ -46,24 +46,10 @@ Sending message via socket.
  [in] msgVars - The message arguments struct.
 \return the number of bits sent.
 *****************************************************************************/
-int SocketTools_SendMessage(SOCKET socket, uint32_t message);
+void SocketTools_SendMessageSize(SOCKET socket, uint32_t message_size);
 
-/*!
-******************************************************************************
-\brief
-Terminating the program.
-\param
- [in] socket - The socket we will send the data.
-\return the number of bits sent.
-*****************************************************************************/
-int SocketTools_SendQuit(SOCKET socket);
+void SocketTools_ReadMessage(SOCKET socket, char* message_size, int size);
 
-/*!
-******************************************************************************
-\brief
-Sending continue session for another file.
-\return the number of bits sent.
-*****************************************************************************/
-int SocketTools_SendContinue(SOCKET socket);
+void SocketTools_SendMessage(SOCKET socket, char* message_size, int size);
 
 #endif //__SOCKET_TOOLS_H__

@@ -72,12 +72,11 @@ Reading message via socket.
  [in] msgVars - The message arguments struct.
 \return the number of bits recieved.
 *****************************************************************************/
-int SocketTools_ReadMessage(SOCKET socket, uint32_t *message)
+void SocketTools_ReadMessageSize(SOCKET socket, uint32_t *message_size)
 {
 	uint32_t rm = 0;
 	int status = recv(socket, &rm, sizeof(uint32_t), 0 );
-	*message = ntohl(rm);
-	return status;
+	*message_size = ntohl(rm);
 }
 
 /*!
@@ -88,34 +87,43 @@ Sending message via socket.
  [in] msgVars - The message arguments struct.
 \return the number of bits sent.
 *****************************************************************************/
-int SocketTools_SendMessage(SOCKET socket, uint32_t message)
+void SocketTools_SendMessageSize(SOCKET socket, uint32_t message_size)
 {
-	uint32_t un = htonl(message);
+	uint32_t un = htonl(message_size);
 	int status = send(socket, &un, sizeof(uint32_t), 0);
-	return status;
 }
 
 /*!
 ******************************************************************************
 \brief
-Terminating the program.
+Sending message via socket.
+\param
+ [in] msgVars - The message arguments struct.
 \return the number of bits sent.
 *****************************************************************************/
-int SocketTools_SendQuit(SOCKET socket)
+void SocketTools_SendMessage(SOCKET socket, char *message_size, int size)
 {
-	return SocketTools_SendMessage(socket, QUIT);
+	int status = send(socket, message_size, size, 0);
+
+	//TODO: Handle errors.
 }
 
 /*!
 ******************************************************************************
 \brief
-Sending continue session for another file.
-\return the number of bits sent.
+Reading message via socket.
+\param
+ [in] msgVars - The message arguments struct.
+\return the number of bits recieved.
 *****************************************************************************/
-int SocketTools_SendContinue(SOCKET socket)
+void SocketTools_ReadMessage(SOCKET socket, char* message_size, int size)
 {
-	return SocketTools_SendMessage(socket, CONTINUE);
+	int status = recv(socket, message_size, size, 0);
+	//TODO: Handle errors.
 }
+
+
+
 
 
 
