@@ -36,8 +36,8 @@ static ChannelOutput ChOutput_s;
 static ChannelArguments ChArgs_s;
 ChannelParams ChParams_s;
 
-static int Channelutils_AddDeterministicNoise();
-static int Channelutils_AddRandomNoise();
+static uint32_t Channelutils_AddDeterministicNoise();
+static uint32_t Channelutils_AddRandomNoise();
 
 /*!
 ******************************************************************************
@@ -51,28 +51,30 @@ void ChannelUtils_ReadInput(int argc, char* argv[])
 {
     int optind;
 
-    for (optind = 1; optind < argc && argv[optind][0] == '-'; optind++) 
-    {
-        switch (argv[optind][-1])
-        {
-            case '-d':  ChParams_s.noise_type = DETERMINISTIC; break;
-            case '-r':  ChParams_s.noise_type = RANDOM; break;
-        }
-    }
+    //for (optind = 1; optind < argc && argv[optind][0] == '-'; optind++) 
+    //{
+    //    switch (argv[optind][-1])
+    //    {
+    //        case '-d':  ChParams_s.noise_type = DETERMINISTIC; break;
+    //        case '-r':  ChParams_s.noise_type = RANDOM; break;
+    //    }
+    //}
 
-    if (ChParams_s.noise_type == DETERMINISTIC)
-    {
-        ChArgs_s.cycle_length = atoi(argv[4]);
-    }
+    //if (ChParams_s.noise_type == DETERMINISTIC)
+    //{
+    //    ChArgs_s.cycle_length = atoi(argv[4]);
+    //}
 
-    else if (ChParams_s.noise_type == RANDOM) 
-    {
-        ChArgs_s.prob = atoi(argv[4]);
-        ChArgs_s.seed = atoi(argv[5]);
-        srand(ChArgs_s.seed);
-        ChArgs_s.prob = ChArgs_s.prob / ERROR_PROB_CONSTANT;
-    }
+    //else if (ChParams_s.noise_type == RANDOM) 
+    //{
+    //    ChArgs_s.prob = atoi(argv[4]);
+    //    ChArgs_s.seed = atoi(argv[5]);
+    //    srand(ChArgs_s.seed);
+    //    ChArgs_s.prob = ChArgs_s.prob / ERROR_PROB_CONSTANT;
+    //}
 
+
+    ChParams_s.noise_type == DETERMINISTIC;
     ChParams_s.sender_ip = "127.0.0.1";
     ChParams_s.sender_port = 6342;
 
@@ -89,9 +91,9 @@ Initialize the channel.
 *****************************************************************************/
 void ChannelUtils_ChannelInit(int argc, char* argv[])
 {
-    memset(&ChParams_s, 0, sizeof(ChannelParams));
-    memset(&ChArgs_s, 0, sizeof(ChannelArguments));
-    memset(&ChOutput_s, 0, sizeof(ChannelArguments));
+    //memset(&ChParams_s, 0, sizeof(ChannelParams));
+    //memset(&ChArgs_s, 0, sizeof(ChannelArguments));
+    //memset(&ChOutput_s, 0, sizeof(ChannelArguments));
 
     ChannelUtils_ReadInput(argc, argv);
 }
@@ -135,7 +137,7 @@ void ChannelUtils_AddNoiseToMessage()
         }
 
         // Add noise.
-        msg =  BitTools_ConvertStringToUint(buf);
+        msg =  BitTools_ConvertStringToUint(buf, false);
         noise = ChParams_s.noise_type == RANDOM ? Channelutils_AddRandomNoise() : Channelutils_AddDeterministicNoise();
         noisy_msg = msg ^ noise;
 

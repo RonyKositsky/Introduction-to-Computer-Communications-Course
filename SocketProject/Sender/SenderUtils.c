@@ -63,10 +63,10 @@ void SenderUtils_SenderInit(char* argv[])
 	/*SenderArgs_s.ip = argv[1];
 	SenderArgs_s.port = atoi(argv[2]);*/
 
-	SenderUtils_InitSession();
-
 	SenderArgs_s.ip = "127.0.0.1";
 	SenderArgs_s.port = 6342;
+
+	SenderUtils_InitSession();
 }
 
 /*!
@@ -139,7 +139,7 @@ uint32_t BitTools_GetMassageWithHamming(uint32_t message_size)
 		
 		// Set to 1 if pairity is 1, otherwise the default is 0 so we don't need to change it.
 		if (!pairity) continue;
-		BIT_SET(message_size, HammingMasks[i]);
+		BIT_SET(message_size, HammingPairingBitsIndexes[i]);
 	}
 	return hammeingMessage;
 }
@@ -163,6 +163,7 @@ static void SenderUtils_GetMessageSize()
 	rewind(SenderParams_s.file);
 	SenderParams_s.message_size = (int)message_chunks * HAMM_MSG_SIZE;
 	SenderParams_s.sent_message = (char*)malloc(SenderParams_s.message_size * sizeof(char));
+	SocketTools_SendMessageSize(SenderParams_s.socket, SenderParams_s.message_size);
 }
 
 static void SenderUtils_AddHammCode()

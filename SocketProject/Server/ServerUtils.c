@@ -84,7 +84,7 @@ void ServerUtils_WriteToFile()
 	while (index < (int)ServerParams_s.message_size)
 	{
 		// Get message as uint.
-		for (size_t i = 0; i < HAMM_MSG_SIZE; i++)
+		for (int i = 0; i < HAMM_MSG_SIZE; i++)
 		{
 			buf[i] = ServerParams_s.message[index];
 			index++;

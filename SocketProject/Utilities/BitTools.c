@@ -30,24 +30,24 @@ uint32_t BitTools_ConvertStringToUint(char* massage, bool hammingAddition)
 	uint32_t val = 0; 
 	int i = 0;
 	int hamming_index = 0;
+	int	msg_index = 0;
 
 	if (massage == NULL)
 		return 0;
 
-	while (massage[i] == '0' || massage[i] == '1')
-	{  
+	for (int i = 0; i < HAMM_MSG_SIZE; i++)
+	{
 		val <<= 1;
-		
+
 		if (hammingAddition && i == HammingPairingBitsIndexes[hamming_index])
 		{
 			hamming_index++;
 		}
 		else
 		{
-			val += massage[i] - '0';
+			val += massage[msg_index] - '0';
+			msg_index++;
 		}
-
-		i++;
 	}
 
 	return val;
