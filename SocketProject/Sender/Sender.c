@@ -19,12 +19,14 @@
 int main(int argc, char* argv[])
 {
 	SenderUtils_SenderInit(argv);
-
+	
 	while (!SenderParams_s.quit)
 	{
 		SenderUtils_ReadingFile();
 
 		SocketTools_SendMessageSize(SenderParams_s.socket, SenderParams_s.message_size);
+		SocketTools_ReadMessageSize(SenderParams_s.socket, &SenderParams_s.ack);
+
 		SocketTools_SendMessage(SenderParams_s.socket, SenderParams_s.sent_message, SenderParams_s.message_size);
 
 		closesocket(SenderParams_s.socket);
@@ -32,6 +34,7 @@ int main(int argc, char* argv[])
 
 		SenderUtils_PrintOutput();
 		SenderUtils_InitSession();
+		SenderParams_s.quit = true;
 	}
 
 	return 0;

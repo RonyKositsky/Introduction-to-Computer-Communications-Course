@@ -22,17 +22,17 @@ int main(int argc, char* argv[])
 	while (!ServerParams_s.quit)
 	{
 		// Get message size.
-		SocketTools_ReadMessageSize(ServerParams_s.accepted_socket, &ServerParams_s.message_size);
+		SocketTools_ReadMessageSize(ServerParams_s.socket, &ServerParams_s.message_size);
+		SocketTools_SendMessageSize(ServerParams_s.socket, ACK);
 
 		// Read message.
 		ServerParams_s.message = (char*)malloc(ServerParams_s.message_size * sizeof(char));
-		SocketTools_ReadMessage(ServerParams_s.accepted_socket, ServerParams_s.message ,ServerParams_s.message_size);
+		SocketTools_ReadMessage(ServerParams_s.socket, ServerParams_s.message ,ServerParams_s.message_size);
 
 		// Write to file.
 		ServerUtils_WriteToFile();
 
 		// Closing procedure.
-		closesocket(ServerParams_s.accepted_socket);
 		closesocket(ServerParams_s.socket);
 		
 		ServerUtils_PrintOutput();

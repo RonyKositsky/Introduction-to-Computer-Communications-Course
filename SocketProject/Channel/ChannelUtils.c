@@ -19,6 +19,9 @@
 *      defines                      *
 ************************************/
 #define ERROR_PROB_CONSTANT (2^16)
+#define LOCAL_HOST_IP "127.0.0.1"
+#define SENDER_PORT 6342
+#define SERVER_PORT 6343
 
 typedef struct
 {
@@ -27,12 +30,7 @@ typedef struct
     int cycle_length;
 }ChannelArguments;
 
-typedef struct
-{
-    int flipped_bits;
-}ChannelOutput;
 
-static ChannelOutput ChOutput_s;
 static ChannelArguments ChArgs_s;
 ChannelParams ChParams_s;
 
@@ -42,13 +40,16 @@ static uint32_t Channelutils_AddRandomNoise();
 /*!
 ******************************************************************************
 \brief
-Reading user input to our variables.
+Initialize the channel.
 \param
  [in] argv - arguments from the user.
 \return none
 *****************************************************************************/
-void ChannelUtils_ReadInput(int argc, char* argv[])
+void ChannelUtils_ChannelInit(int argc, char* argv[])
 {
+    memset(&ChParams_s, 0, sizeof(ChannelParams));
+    memset(&ChArgs_s, 0, sizeof(ChannelArguments));
+
     int optind;
 
     //for (optind = 1; optind < argc && argv[optind][0] == '-'; optind++) 
@@ -73,10 +74,11 @@ void ChannelUtils_ReadInput(int argc, char* argv[])
     //    ChArgs_s.prob = ChArgs_s.prob / ERROR_PROB_CONSTANT;
     //}
 
-
-    ChParams_s.noise_type == DETERMINISTIC;
-    ChParams_s.sender_ip = "127.0.0.1";
-    ChParams_s.sender_port = 6342;
+    
+    ChParams_s.sender_ip = LOCAL_HOST_IP;
+    ChParams_s.server_ip = LOCAL_HOST_IP;
+    ChParams_s.sender_port = SENDER_PORT;
+    ChParams_s.server_port = SERVER_PORT;
 
     ChannelUtils_InitSession();
 }
@@ -84,36 +86,21 @@ void ChannelUtils_ReadInput(int argc, char* argv[])
 /*!
 ******************************************************************************
 \brief
-Initialize the channel.
-\param
- [in] argv - arguments from the user.
-\return none
-*****************************************************************************/
-void ChannelUtils_ChannelInit(int argc, char* argv[])
-{
-    //memset(&ChParams_s, 0, sizeof(ChannelParams));
-    //memset(&ChArgs_s, 0, sizeof(ChannelArguments));
-    //memset(&ChOutput_s, 0, sizeof(ChannelArguments));
-
-    ChannelUtils_ReadInput(argc, argv);
-}
-
-/*!
-******************************************************************************
-\brief
-Initializing new session.
+Initializing new session. Channel behave like 2 way server.
 \return none
 *****************************************************************************/
 void ChannelUtils_InitSession()
 {
-    // TODO: handle errors.
-    
-    // channel as server (recieves messages from the sender)
-    ChParams_s.sender_sock = SocketTools_CreateSocket(ChParams_s.sender_ip, ChParams_s.sender_port, SERVER);
-    ChParams_s.accepted_sock = accept(ChParams_s.sender_sock, NULL, NULL);
+    ChParams_s.message_size = 0;
+    ChParams_s.flipped_bits = 0;
 
-    // channel as sender (sends messages to the server)
-    //ChParams_s.server_sock = SocketTools_CreateSocket();
+    // Init sender connection.
+    ChParams_s.sender_sock = SocketTools_CreateSocket(ChParams_s.sender_ip, ChParams_s.sender_port, SERVER);
+    ChParams_s.sender_accepted_sock = accept(ChParams_s.sender_sock, NULL, NULL);
+
+    // Init server connection.
+    ChParams_s.server_sock = SocketTools_CreateSocket(ChParams_s.server_ip, ChParams_s.server_port, SERVER);
+    ChParams_s.server_accepted_sock = accept(ChParams_s.server_sock, NULL, NULL);
 }
 
 /*!
@@ -158,19 +145,19 @@ Adding noise to recieved message.
 *****************************************************************************/
 void ChannelUtils_AskToContinue()
 {
-    char response[10];
-    printf("continue? (yes/no)");
-    if (!scanf("%s", response))
+    char response[10]; // Big enough buffer.
+    printf("continue? (yes/no)\n");
+    if (scanf("%s", response) < 0)
     {
         printf("Error in scanning answer.");
         exit(-1);
     }
-    ChParams_s.quit = strcmp(response, "yes") == 0;
+    ChParams_s.quit = strcmp(response, "yes");
 }
 
 void ChannelUtils_PrintStatistics()
 {
-    // TODO: Implement
+    printf("retransmitted %d bytes, flipped %d bits", ChParams_s.message_size, ChParams_s.flipped_bits);
 }
 
 
@@ -183,7 +170,7 @@ static uint32_t Channelutils_AddRandomNoise()
         flip = rand() % 100 < (ChArgs_s.prob * 100);
         if (!flip) continue;
         BIT_FLIP(noise, bit);
-        ChOutput_s.flipped_bits++;
+        ChParams_s.flipped_bits++;
     };
 
     return noise;
@@ -198,7 +185,7 @@ static int Channelutils_AddDeterministicNoise()
         if (counter % ChArgs_s.cycle_length == 0) 
         {
             BIT_FLIP(noise, bit);
-            ChOutput_s.flipped_bits++;
+            ChParams_s.flipped_bits++;
         };
 
         counter++;

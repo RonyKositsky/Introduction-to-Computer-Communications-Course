@@ -9,7 +9,7 @@
 *      include                      *
 ************************************/
 #include "BitTools.h"
-
+#include <stdio.h>
 /************************************
 *      functions                    *
 ************************************/
@@ -37,15 +37,14 @@ uint32_t BitTools_ConvertStringToUint(char* massage, bool hammingAddition)
 
 	for (int i = 0; i < HAMM_MSG_SIZE; i++)
 	{
-		val <<= 1;
-
 		if (hammingAddition && i == HammingPairingBitsIndexes[hamming_index])
 		{
 			hamming_index++;
 		}
 		else
 		{
-			val += massage[msg_index] - '0';
+			if (massage[msg_index] == '1')
+				BIT_SET(val, i);
 			msg_index++;
 		}
 	}
@@ -86,9 +85,9 @@ int BitTools_BitwiseXOR(uint32_t num)
 	return pairity;
 }
 
-char BitTools_GetNBit(uint32_t num, int n)
+int BitTools_GetNBit(uint32_t num, int n)
 {
-	return  (char)(((1 << n) - 1) & num);
+	return  ((num >> n & 1));
 }
 
 

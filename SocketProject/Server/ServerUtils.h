@@ -22,12 +22,12 @@
 typedef struct
 {
 	SOCKET socket;
-	SOCKET accepted_socket;
 	FILE* file;
 	uint32_t message_size;
 	uint32_t messageHamming;
 	bool quit;
 	char* message;
+	int bytes_fixed;
 }ServerParams;
 
 extern ServerParams ServerParams_s;

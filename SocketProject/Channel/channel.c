@@ -24,23 +24,27 @@ int main(int argc, char* argv[])
     while (!ChParams_s.quit)
     {
         // Getting message size.
-        SocketTools_ReadMessageSize(ChParams_s.accepted_sock, &ChParams_s.message_size);
-        SocketTools_SendMessageSize(ChParams_s.server_sock, ChParams_s.message_size);
+        SocketTools_ReadMessageSize(ChParams_s.sender_accepted_sock, &ChParams_s.message_size);
+        SocketTools_SendMessageSize(ChParams_s.sender_accepted_sock, ACK);
+
+        SocketTools_SendMessageSize(ChParams_s.server_accepted_sock, ChParams_s.message_size);
+        SocketTools_ReadMessageSize(ChParams_s.server_accepted_sock, &ChParams_s.message_size);
 
         // Reading message.
         ChParams_s.message = (char*)malloc(ChParams_s.message_size * sizeof(char));
-        SocketTools_ReadMessage(ChParams_s.accepted_sock, ChParams_s.message, ChParams_s.message_size);
+        SocketTools_ReadMessage(ChParams_s.sender_accepted_sock, ChParams_s.message, ChParams_s.message_size);
+
         ChannelUtils_AddNoiseToMessage();
 
         // Sending noisy message.
-        //SocketTools_SendMessage(ChParams_s.server_sock, ChParams_s.message, ChParams_s.message_size);
+        SocketTools_SendMessage(ChParams_s.server_sock, ChParams_s.message, ChParams_s.message_size);
         
         // Closing current procedure.
-        SocketTools_ReadMessageSize(ChParams_s.accepted_sock, &ChParams_s.message_size);
-        closesocket(ChParams_s.accepted_sock);
+        closesocket(ChParams_s.sender_accepted_sock);
+        closesocket(ChParams_s.server_accepted_sock);
         free(ChParams_s.message);
 
-        // Print
+        ChannelUtils_PrintStatistics();
         ChannelUtils_AskToContinue();
     }
     

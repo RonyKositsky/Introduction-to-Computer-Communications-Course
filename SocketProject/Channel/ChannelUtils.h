@@ -31,13 +31,15 @@ typedef struct
 	char* message_sent;
 	SOCKET server_sock;
 	SOCKET sender_sock;
-	SOCKET accepted_sock;
+	SOCKET sender_accepted_sock;
+	SOCKET server_accepted_sock;
 	Noise noise_type;
 	char* sender_ip;
 	char* server_ip;
 	int sender_port;
 	int server_port;
 	bool quit;
+	int flipped_bits;
 }ChannelParams;
 
 /************************************

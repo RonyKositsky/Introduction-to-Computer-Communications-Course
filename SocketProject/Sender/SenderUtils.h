@@ -21,6 +21,7 @@ typedef struct
 {
 	SOCKET socket;
 	FILE* file;
+	uint32_t ack;
 	char msg_buffer[MSG_SIZE];
 	char filename[FILE_NAME_BUFFER];
 	bool quit;

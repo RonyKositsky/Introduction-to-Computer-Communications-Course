@@ -24,24 +24,17 @@ typedef struct
 	char* ip;
 }ServerArguments;
 
-typedef struct
-{
-	int BytesRecieved;
-	int BytesWritten;
-	int FramesFixed;
-}ServerOutputParams;
 
 /************************************
 *      variables                    *
 ************************************/
 static ServerArguments ServerArgs_s;
-static ServerOutputParams ServerOutParams_s;
 ServerParams ServerParams_s;
 
 /************************************
 *      static functions             *
 ************************************/
-void SenderUtils_OpenFile();
+static void SenderUtils_OpenFile();
 static uint32_t ServerUtils_StripHammingCode(uint32_t message_size);
 
 /************************************
@@ -60,7 +53,6 @@ void ServerUtils_ServerInit(char* argv[])
 {
 	memset(&ServerArgs_s, 0, sizeof(ServerArguments));
 	memset(&ServerParams_s, 0, sizeof(ServerParams));
-	memset(&ServerOutParams_s, 0, sizeof(ServerOutputParams));
 
 	// Rading values from user.
 	ServerArgs_s.ip = argv[1];
@@ -119,9 +111,9 @@ Printing relevant data and statistics.
 *****************************************************************************/
 void ServerUtils_PrintOutput()
 {
-	fprintf(stderr, "Received: %d bytes\n", ServerOutParams_s.BytesRecieved);
-	fprintf(stderr, "Wrote: %d bytes\n", ServerOutParams_s.BytesWritten);
-	fprintf(stderr, "Detected and corrected %d errors\n", ServerOutParams_s.FramesFixed);
+	printf("Received: %d bytes\n", ServerParams_s.message_size);
+	printf("Wrote: %d bytes\n", ServerParams_s.message_size / HAMM_MSG_SIZE * MSG_SIZE);
+	printf("Detected and corrected %d errors\n", ServerParams_s.bytes_fixed);
 }
 
 /************************************
@@ -158,6 +150,7 @@ uint32_t ServerUtils_StripHammingCode(uint32_t msg)
 		i++;
 	}
 
+	ServerParams_s.bytes_fixed++;
 	ret = BIT_FLIP(ret, index);
 	return ret;
 }
@@ -176,6 +169,5 @@ void ServerUtils_SessionInit()
 {
 	SenderUtils_OpenFile();
 	if (ServerParams_s.quit) return;
-	ServerParams_s.socket = SocketTools_CreateSocket(ServerArgs_s.ip, ServerArgs_s.port, SERVER);
-	ServerParams_s.accepted_socket = accept(ServerParams_s.socket, NULL, NULL);
+	ServerParams_s.socket = SocketTools_CreateSocket(ServerArgs_s.ip, ServerArgs_s.port, CLIENT);
 }
