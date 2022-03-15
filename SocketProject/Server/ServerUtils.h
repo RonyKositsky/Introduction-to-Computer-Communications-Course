@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "../Utilities/Definitions.h"
 
 /************************************
 *       types                       *
@@ -25,6 +26,7 @@ typedef struct
 	FILE* file;
 	uint32_t message_size;
 	uint32_t messageHamming;
+	char filename[FILE_NAME_BUFFER];
 	bool quit;
 	char* message;
 	int bytes_fixed;

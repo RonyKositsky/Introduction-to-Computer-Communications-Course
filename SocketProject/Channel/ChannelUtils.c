@@ -75,12 +75,17 @@ void ChannelUtils_ChannelInit(int argc, char* argv[])
     //}
 
     
-    ChParams_s.sender_ip = LOCAL_HOST_IP;
-    ChParams_s.server_ip = LOCAL_HOST_IP;
+    ChParams_s.ip = LOCAL_HOST_IP;
     ChParams_s.sender_port = SENDER_PORT;
     ChParams_s.server_port = SERVER_PORT;
+    ChParams_s.noise_type = DETERMINISTIC;
+    ChArgs_s.cycle_length = 90;
+    printf("sender socket : IP address = %s port = %d\n", ChParams_s.ip, ChParams_s.sender_port);
+    printf("receiver socket : IP address = %s port = %d\n", ChParams_s.ip, ChParams_s.server_port);
 
     ChannelUtils_InitSession();
+
+
 }
 
 /*!
@@ -95,11 +100,11 @@ void ChannelUtils_InitSession()
     ChParams_s.flipped_bits = 0;
 
     // Init sender connection.
-    ChParams_s.sender_sock = SocketTools_CreateSocket(ChParams_s.sender_ip, ChParams_s.sender_port, SERVER);
+    ChParams_s.sender_sock = SocketTools_CreateSocket(ChParams_s.ip, ChParams_s.sender_port, SERVER);
     ChParams_s.sender_accepted_sock = accept(ChParams_s.sender_sock, NULL, NULL);
 
     // Init server connection.
-    ChParams_s.server_sock = SocketTools_CreateSocket(ChParams_s.server_ip, ChParams_s.server_port, SERVER);
+    ChParams_s.server_sock = SocketTools_CreateSocket(ChParams_s.ip, ChParams_s.server_port, SERVER);
     ChParams_s.server_accepted_sock = accept(ChParams_s.server_sock, NULL, NULL);
 }
 
@@ -132,7 +137,7 @@ void ChannelUtils_AddNoiseToMessage()
         for (int i = 0; i < HAMM_MSG_SIZE; i++)
         {
             int sent_off = index - HAMM_MSG_SIZE;
-            ChParams_s.message_sent[sent_off + i] = BitTools_GetNBit(noisy_msg, i);
+            ChParams_s.message_sent[sent_off + i] = BitTools_GetNBit(noisy_msg, i) == 0 ? '0' : '1';
         }
     }
 }
@@ -157,7 +162,7 @@ void ChannelUtils_AskToContinue()
 
 void ChannelUtils_PrintStatistics()
 {
-    printf("retransmitted %d bytes, flipped %d bits", ChParams_s.message_size, ChParams_s.flipped_bits);
+    printf("retransmitted %d bytes, flipped %d bits.\n", ChParams_s.message_size, ChParams_s.flipped_bits);
 }
 
 
@@ -180,7 +185,7 @@ static int Channelutils_AddDeterministicNoise()
 {
     static int counter = 0;
     uint32_t noise = 0;
-    for (int bit = 0; bit < HAMM_MSG_SIZE - 1; bit++) 
+    for (int bit = 0; bit < HAMM_MSG_SIZE; bit++) 
     {
         if (counter % ChArgs_s.cycle_length == 0) 
         {

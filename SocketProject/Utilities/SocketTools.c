@@ -101,9 +101,9 @@ Sending message via socket.
  [in] msgVars - The message arguments struct.
 \return the number of bits sent.
 *****************************************************************************/
-void SocketTools_SendMessage(SOCKET socket, char *message_size, int size)
+void SocketTools_SendMessage(SOCKET socket, char *message, int size)
 {
-	int status = send(socket, message_size, size, 0);
+	int status = send(socket, message, size, 0);
 
 	//TODO: Handle errors.
 }
@@ -116,9 +116,9 @@ Reading message via socket.
  [in] msgVars - The message arguments struct.
 \return the number of bits recieved.
 *****************************************************************************/
-void SocketTools_ReadMessage(SOCKET socket, char* message_size, int size)
+void SocketTools_ReadMessage(SOCKET socket, char* message, int size)
 {
-	int status = recv(socket, message_size, size, 0);
+	int status = recv(socket, message, size, 0);
 	//TODO: Handle errors.
 }
 

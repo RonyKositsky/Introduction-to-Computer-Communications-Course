@@ -18,6 +18,7 @@
 ************************************/
 int main(int argc, char* argv[])
 {
+
 	ServerUtils_ServerInit(argv);
 	while (!ServerParams_s.quit)
 	{

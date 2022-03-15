@@ -86,11 +86,14 @@ void SenderUtils_OpenFile()
 {
 	//TODO: Handle errors, quit.
 	printf("File name:");
-	//scanf("%s", SenderArgs_s.filename);
-	strcpy(SenderParams_s.filename, "C:\\GitUni\\Introduction-to-Computer-Communications-Course\\file.txt");
-	SenderParams_s.file = fopen(SenderParams_s.filename, "rb");
-	
-	//TODO: IF "quit" quit = 1;
+	scanf("%s", SenderParams_s.filename);
+	if (strcmp(SenderParams_s.filename, "quit")) // returns 1 if they are not equal.
+	{
+		// TODO: Handle errors.
+		SenderParams_s.file = fopen(SenderParams_s.filename, "rb");
+		return;
+	}
+	SenderParams_s.quit = true;
 }
 
 /*!

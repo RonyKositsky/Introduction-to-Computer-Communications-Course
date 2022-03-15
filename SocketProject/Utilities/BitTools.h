@@ -43,15 +43,6 @@ static int HammingMasks[HAMM_PAIRITY_BITS] =
 	FIFTH_PAIRITY_MASK, 
 };
 
-static int HammingMasksCehcks[HAMM_PAIRITY_BITS] =
-{
-	FIRST_PAIRITY_MASK_CHECK,
-	SECOND_PAIRITY_MASK_CHECK,
-	THIRD_PAIRITY_MASK_CHECK,
-	FOURTH_PAIRITY_MASK_CHECK,
-	FIFTH_PAIRITY_MASK_CHECK,
-};
-
 
 /************************************
 *       API                         *

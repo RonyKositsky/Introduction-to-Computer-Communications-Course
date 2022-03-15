@@ -20,6 +20,7 @@
 int main(int argc, char* argv[])
 {
     ChannelUtils_ChannelInit(argc, argv);
+    uint32_t ack;
 
     while (!ChParams_s.quit)
     {
@@ -28,16 +29,17 @@ int main(int argc, char* argv[])
         SocketTools_SendMessageSize(ChParams_s.sender_accepted_sock, ACK);
 
         SocketTools_SendMessageSize(ChParams_s.server_accepted_sock, ChParams_s.message_size);
-        SocketTools_ReadMessageSize(ChParams_s.server_accepted_sock, &ChParams_s.message_size);
+        SocketTools_ReadMessageSize(ChParams_s.server_accepted_sock, &ack);
 
         // Reading message.
         ChParams_s.message = (char*)malloc(ChParams_s.message_size * sizeof(char));
+        ChParams_s.message_sent = (char*)malloc(ChParams_s.message_size * sizeof(char));
         SocketTools_ReadMessage(ChParams_s.sender_accepted_sock, ChParams_s.message, ChParams_s.message_size);
 
         ChannelUtils_AddNoiseToMessage();
 
         // Sending noisy message.
-        SocketTools_SendMessage(ChParams_s.server_sock, ChParams_s.message, ChParams_s.message_size);
+        SocketTools_SendMessage(ChParams_s.server_accepted_sock, ChParams_s.message_sent, ChParams_s.message_size);
         
         // Closing current procedure.
         closesocket(ChParams_s.sender_accepted_sock);

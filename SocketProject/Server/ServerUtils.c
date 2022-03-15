@@ -55,8 +55,11 @@ void ServerUtils_ServerInit(char* argv[])
 	memset(&ServerParams_s, 0, sizeof(ServerParams));
 
 	// Rading values from user.
-	ServerArgs_s.ip = argv[1];
-	ServerArgs_s.port = atoi(argv[2]);
+	//ServerArgs_s.ip = argv[1];
+	//ServerArgs_s.port = atoi(argv[2]);
+
+	ServerArgs_s.ip = "127.0.0.1";
+	ServerArgs_s.port = 6343;
 
 	ServerUtils_SessionInit();
 }
@@ -87,17 +90,20 @@ void ServerUtils_WriteToFile()
 		recovered_message = ServerUtils_StripHammingCode(msg);
 
 		// Add to sent buffer.
-		int j = 0;
+		int hamming_index = 0;
+		int msg_index = 0;
+		char stripped_message[MSG_SIZE] = { 0 };
 		for (int i = 0; i < HAMM_MSG_SIZE; i++)
 		{
-			if (HammingPairingBitsIndexes[j] == i)
+			if (HammingPairingBitsIndexes[hamming_index] == i)
 			{
-				j++;
+				hamming_index++;
 				continue;
 			}
-			bit = BitTools_GetNBit(recovered_message, i);
-			fputs(&bit, ServerParams_s.file);
+			stripped_message[msg_index] = BitTools_GetNBit(recovered_message, i) == 0 ? '0' : '1';
+			msg_index++;
 		}
+		fwrite(stripped_message, sizeof(char), MSG_SIZE, ServerParams_s.file);
 	}
 
 	fclose(ServerParams_s.file);
@@ -128,30 +134,32 @@ Returns the message without the hamming code. Making corrections if possible.
 *****************************************************************************/
 uint32_t ServerUtils_StripHammingCode(uint32_t msg)
 {
-	uint32_t paitiy = BitTools_BitwiseXOR(msg);
-	if (!paitiy) // No error.
-		return msg;
-
+	bool error_detected = false;
 	uint32_t ret = msg;
 
-	// TODO: If we have 2+ errors.
-	
 	// We will use the 3blue1brown method to find the errored index.
 	// We will go from the highest index, and if there is difference in the pairty we will add 2^i.
 	int i = 0;
-	int index = 0;
+	int index = -1;
+	int index2 = 0;
+	uint32_t masked;
 	for (int j = HAMM_PAIRITY_BITS - 1; j >= 0; j--)
 	{
-		uint32_t masked = msg & HammingMasksCehcks[j];
-		if (BitTools_BitwiseXOR(masked) != 0)
+		masked = msg & HammingMasks[j];
+		if (BitTools_BitwiseXOR(masked))
 		{
-			index += (int)pow(2,i) - 1;
+			error_detected = true;
+			index += (int)pow(2,j);
 		}
 		i++;
 	}
 
-	ServerParams_s.bytes_fixed++;
-	ret = BIT_FLIP(ret, index);
+	if (error_detected)
+	{
+		ServerParams_s.bytes_fixed++;
+		ret = BIT_FLIP(ret, index);
+	}
+
 	return ret;
 }
 
@@ -159,10 +167,13 @@ void SenderUtils_OpenFile()
 {
 	//TODO: Handle errors, quit.
 	printf("File name:");
-	//scanf("%s", SenderArgs_s.filename);
-	char filename[FILE_NAME_BUFFER];
-	strcpy(filename, "C:\\GitUni\\Introduction-to-Computer-Communications-Course\\res.txt");
-	ServerParams_s.file = fopen(filename, "wb");
+	scanf("%s", ServerParams_s.filename);
+	if (strcmp(ServerParams_s.filename, "quit"))
+	{
+		ServerParams_s.file = fopen(ServerParams_s.filename, "w");
+		return;
+	}
+	ServerParams_s.quit = true;
 }
 
 void ServerUtils_SessionInit()

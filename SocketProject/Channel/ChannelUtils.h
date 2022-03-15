@@ -34,8 +34,7 @@ typedef struct
 	SOCKET sender_accepted_sock;
 	SOCKET server_accepted_sock;
 	Noise noise_type;
-	char* sender_ip;
-	char* server_ip;
+	char* ip;
 	int sender_port;
 	int server_port;
 	bool quit;

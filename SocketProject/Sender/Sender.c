@@ -34,7 +34,6 @@ int main(int argc, char* argv[])
 
 		SenderUtils_PrintOutput();
 		SenderUtils_InitSession();
-		SenderParams_s.quit = true;
 	}
 
 	return 0;
