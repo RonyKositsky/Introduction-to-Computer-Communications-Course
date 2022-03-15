@@ -50,42 +50,30 @@ void ChannelUtils_ChannelInit(int argc, char* argv[])
     memset(&ChParams_s, 0, sizeof(ChannelParams));
     memset(&ChArgs_s, 0, sizeof(ChannelArguments));
 
-    int optind;
+    ASSERT((argc <= 4) && (argc > 1), "Error in channel arguments");
 
-    //for (optind = 1; optind < argc && argv[optind][0] == '-'; optind++) 
-    //{
-    //    switch (argv[optind][-1])
-    //    {
-    //        case '-d':  ChParams_s.noise_type = DETERMINISTIC; break;
-    //        case '-r':  ChParams_s.noise_type = RANDOM; break;
-    //    }
-    //}
-
-    //if (ChParams_s.noise_type == DETERMINISTIC)
-    //{
-    //    ChArgs_s.cycle_length = atoi(argv[4]);
-    //}
-
-    //else if (ChParams_s.noise_type == RANDOM) 
-    //{
-    //    ChArgs_s.prob = atoi(argv[4]);
-    //    ChArgs_s.seed = atoi(argv[5]);
-    //    srand(ChArgs_s.seed);
-    //    ChArgs_s.prob = ChArgs_s.prob / ERROR_PROB_CONSTANT;
-    //}
-
-    
+    if (argc == 4)
+    {
+        ChParams_s.noise_type = RANDOM;
+        ChArgs_s.prob = atoi(argv[2]);
+        ChArgs_s.seed = atoi(argv[3]);
+        srand(ChArgs_s.seed);
+        ChArgs_s.prob = ChArgs_s.prob / ERROR_PROB_CONSTANT;
+    }    
+    else
+    {
+        ChArgs_s.cycle_length = atoi(argv[2]);
+        ChParams_s.noise_type = DETERMINISTIC;
+    }
+        
     ChParams_s.ip = LOCAL_HOST_IP;
     ChParams_s.sender_port = SENDER_PORT;
     ChParams_s.server_port = SERVER_PORT;
-    ChParams_s.noise_type = DETERMINISTIC;
-    ChArgs_s.cycle_length = 90;
+
     printf("sender socket : IP address = %s port = %d\n", ChParams_s.ip, ChParams_s.sender_port);
     printf("receiver socket : IP address = %s port = %d\n", ChParams_s.ip, ChParams_s.server_port);
 
     ChannelUtils_InitSession();
-
-
 }
 
 /*!
@@ -157,7 +145,7 @@ void ChannelUtils_AskToContinue()
         printf("Error in scanning answer.");
         exit(-1);
     }
-    ChParams_s.quit = strcmp(response, "yes");
+    ChParams_s.quit = strncmp(response, "yes", 10);
 }
 
 void ChannelUtils_PrintStatistics()

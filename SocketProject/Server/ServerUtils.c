@@ -55,11 +55,8 @@ void ServerUtils_ServerInit(char* argv[])
 	memset(&ServerParams_s, 0, sizeof(ServerParams));
 
 	// Rading values from user.
-	//ServerArgs_s.ip = argv[1];
-	//ServerArgs_s.port = atoi(argv[2]);
-
-	ServerArgs_s.ip = "127.0.0.1";
-	ServerArgs_s.port = 6343;
+	ServerArgs_s.ip = argv[1];
+	ServerArgs_s.port = atoi(argv[2]);
 
 	ServerUtils_SessionInit();
 }
@@ -165,12 +162,12 @@ uint32_t ServerUtils_StripHammingCode(uint32_t msg)
 
 void SenderUtils_OpenFile()
 {
-	//TODO: Handle errors, quit.
 	printf("File name:");
-	scanf("%s", ServerParams_s.filename);
+	ASSERT(scanf("%s", ServerParams_s.filename) == 1, "Error in response in server");
 	if (strcmp(ServerParams_s.filename, "quit"))
 	{
 		ServerParams_s.file = fopen(ServerParams_s.filename, "w");
+		ASSERT(ServerParams_s.file != NULL, "Error in open file in server.");
 		return;
 	}
 	ServerParams_s.quit = true;

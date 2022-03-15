@@ -15,6 +15,11 @@
 #include <winsock2.h>
 
 /************************************
+*       definitions		            *
+************************************/
+#define SUCCESS 0
+
+/************************************
 *       API implementation          *
 ************************************/
 
@@ -28,37 +33,25 @@ SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType type)
 {
 	WSADATA wsaData;
 	WORD wVersionRequested = MAKEWORD(2, 2);
-	int err = WSAStartup(wVersionRequested, &wsaData);
-	if(err != 0)
-	{
-		fprintf(stderr, "WSAStartup failed with error: %d\n", err);
-		exit(-1);
-	}
+	ASSERT( WSAStartup(wVersionRequested, &wsaData) == SUCCESS,  "WSAStartup failed");
 	
 	SOCKET sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (sockfd == INVALID_SOCKET)
-	{
-		fprintf(stderr, "Failed to create socket, error %d", WSAGetLastError());
-		exit(-1);
-	}
+	ASSERT(sockfd != INVALID_SOCKET, "Failed to create socket.");
 
 	struct sockaddr_in sa;
-	int status;
 
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons(port);
 	sa.sin_addr.s_addr = inet_addr(ip);
 
-
-	// TODO: Error handling.
 	if (type == CLIENT)
 	{
-		status = connect(sockfd, (SOCKADDR*)&sa, sizeof(struct sockaddr));
+		ASSERT(connect(sockfd, (SOCKADDR*)&sa, sizeof(struct sockaddr)) == SUCCESS, "Error in connect() function.");
 	}
 	else
 	{
-		status = bind(sockfd, (SOCKADDR*)&sa, sizeof(struct sockaddr));
-		status = listen(sockfd, SOMAXCONN);
+		ASSERT(bind(sockfd, (SOCKADDR*)&sa, sizeof(struct sockaddr)) == SUCCESS, "Error in bind() function.");
+		ASSERT(listen(sockfd, SOMAXCONN) == SUCCESS, "Error in listen() function.");
 	}
 
 	return sockfd;
@@ -75,7 +68,7 @@ Reading message via socket.
 void SocketTools_ReadMessageSize(SOCKET socket, uint32_t *message_size)
 {
 	uint32_t rm = 0;
-	int status = recv(socket, &rm, sizeof(uint32_t), 0 );
+	ASSERT(recv(socket, &rm, sizeof(uint32_t), 0) == SUCCESS, "Error in recieving message size.");
 	*message_size = ntohl(rm);
 }
 
@@ -90,7 +83,7 @@ Sending message via socket.
 void SocketTools_SendMessageSize(SOCKET socket, uint32_t message_size)
 {
 	uint32_t un = htonl(message_size);
-	int status = send(socket, &un, sizeof(uint32_t), 0);
+	ASSERT(send(socket, &un, sizeof(uint32_t), 0) == SUCCESS, "Error in sending message size.");
 }
 
 /*!
@@ -103,9 +96,7 @@ Sending message via socket.
 *****************************************************************************/
 void SocketTools_SendMessage(SOCKET socket, char *message, int size)
 {
-	int status = send(socket, message, size, 0);
-
-	//TODO: Handle errors.
+	ASSERT(send(socket, message, size, 0) == SUCCESS, "Error in sending message.");
 }
 
 /*!
@@ -118,8 +109,7 @@ Reading message via socket.
 *****************************************************************************/
 void SocketTools_ReadMessage(SOCKET socket, char* message, int size)
 {
-	int status = recv(socket, message, size, 0);
-	//TODO: Handle errors.
+	ASSERT(recv(socket, message, size, 0) == SUCCESS, "Error in reading message.");
 }
 
 

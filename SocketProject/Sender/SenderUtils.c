@@ -84,13 +84,12 @@ void SenderUtils_ReadingFile()
 
 void SenderUtils_OpenFile()
 {
-	//TODO: Handle errors, quit.
 	printf("File name:");
-	scanf("%s", SenderParams_s.filename);
+	ASSERT(scanf("%s", SenderParams_s.filename) == 1, "Error in scanning file");
 	if (strcmp(SenderParams_s.filename, "quit")) // returns 1 if they are not equal.
 	{
-		// TODO: Handle errors.
 		SenderParams_s.file = fopen(SenderParams_s.filename, "rb");
+		ASSERT(SenderParams_s.file != NULL, "Error in open file in sender.");
 		return;
 	}
 	SenderParams_s.quit = true;
