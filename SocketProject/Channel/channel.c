@@ -24,6 +24,8 @@ int main(int argc, char* argv[])
 
     while (!ChParams_s.quit)
     {
+        ChannelUtils_InitSession();
+
         // Getting message size.
         SocketTools_ReadMessageSize(ChParams_s.sender_accepted_sock, &ChParams_s.message_size);
         SocketTools_SendMessageSize(ChParams_s.sender_accepted_sock, ACK);

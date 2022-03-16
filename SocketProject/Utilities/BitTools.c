@@ -86,6 +86,12 @@ int BitTools_BitwiseXOR(uint32_t num)
 	return pairity;
 }
 
+/*!
+******************************************************************************
+\brief
+Getting the nth bit of the num.
+\return bit value.
+*****************************************************************************/
 int BitTools_GetNBit(uint32_t num, int n)
 {
 	return  ((num >> n & 1));

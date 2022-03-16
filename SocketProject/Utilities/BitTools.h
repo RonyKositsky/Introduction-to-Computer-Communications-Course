@@ -72,6 +72,12 @@ Adding to recieved message 5 pairity bits.
 *****************************************************************************/
 int BitTools_BitwiseXOR(uint32_t num);
 
+/*!
+******************************************************************************
+\brief
+Getting the nth bit of the num.
+\return bit value.
+*****************************************************************************/
 int BitTools_GetNBit(uint32_t num, int n);
 
 #endif //__BIT_TOOLS_H__

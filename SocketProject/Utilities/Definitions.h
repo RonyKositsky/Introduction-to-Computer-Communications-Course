@@ -28,13 +28,13 @@
 
 #define ACK (0x80000000)
 
-#define ASSERT(cond, msg, ...)																\
-		if (!(cond))																		\
-		{																					\
-			printf("Assertion failed at file %s line %d: \n", __FILE__, __LINE__);			\
-			printf(msg, __VA_ARGS__);														\
-			exit(-1);																		\
-		}																					\
+#define ASSERT(cond, msg, ...)																 \
+		if (!(cond))																		 \
+		{																					 \
+			fprintf(stderr, "Assertion failed at file %s line %d: \n", __FILE__, __LINE__);	 \
+			printf(msg, __VA_ARGS__);														 \
+			exit(-1);																		 \
+		}																					 \
 
 
 typedef enum

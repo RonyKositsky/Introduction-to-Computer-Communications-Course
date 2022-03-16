@@ -151,7 +151,12 @@ uint32_t BitTools_GetMassageWithHamming(uint32_t msg)
 	return hammingMessage;
 }
 
-
+/*!
+******************************************************************************
+\brief
+Calculating the message size.
+\return none.
+*****************************************************************************/
 static void SenderUtils_GetMessageSize()
 {
 	size_t err, message_chunks = 0;
@@ -172,6 +177,12 @@ static void SenderUtils_GetMessageSize()
 	SenderParams_s.sent_message = (char*)malloc(SenderParams_s.message_size * sizeof(char));
 }
 
+/*!
+******************************************************************************
+\brief
+Preparing the sent message to be sent.
+\return none.
+*****************************************************************************/
 static void SenderUtils_AddHammCode()
 {
 	size_t err, index = 0;

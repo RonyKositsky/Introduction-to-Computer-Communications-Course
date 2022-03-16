@@ -16,13 +16,16 @@
 #include <stdint.h>
 
 /************************************
-*      defines                      *
+*      definitions                  *
 ************************************/
 #define ERROR_PROB_CONSTANT (2^16)
 #define LOCAL_HOST_IP "127.0.0.1"
 #define SENDER_PORT 6342
 #define SERVER_PORT 6343
 
+/************************************
+*       types                       *
+************************************/
 typedef struct
 {
     int prob;
@@ -30,10 +33,15 @@ typedef struct
     int cycle_length;
 }ChannelArguments;
 
-
+/************************************
+*      variables                 *
+************************************/
 static ChannelArguments ChArgs_s;
 ChannelParams ChParams_s;
 
+/************************************
+*      static functions             *
+************************************/
 static uint32_t Channelutils_AddDeterministicNoise();
 static uint32_t Channelutils_AddRandomNoise();
 
@@ -71,10 +79,7 @@ void ChannelUtils_ChannelInit(int argc, char* argv[])
     ChParams_s.server_port = SERVER_PORT;
 
     printf("sender socket : IP address = %s port = %d\n", ChParams_s.ip, ChParams_s.sender_port);
-    printf("receiver socket : IP address = %s port = %d\n", ChParams_s.ip, ChParams_s.server_port);
-
-    ChannelUtils_InitSession();
-}
+    printf("receiver socket : IP address = %s port = %d\n", ChParams_s.ip, ChParams_s.server_port);}
 
 /*!
 ******************************************************************************
@@ -153,7 +158,12 @@ void ChannelUtils_PrintStatistics()
     printf("retransmitted %d bytes, flipped %d bits.\n", ChParams_s.message_size, ChParams_s.flipped_bits);
 }
 
-
+/*!
+******************************************************************************
+\brief
+Adding noise to random bits based on user input.
+\return none
+*****************************************************************************/
 static uint32_t Channelutils_AddRandomNoise()
 {
     uint32_t noise = 0;
@@ -169,6 +179,12 @@ static uint32_t Channelutils_AddRandomNoise()
     return noise;
 }
 
+/*!
+******************************************************************************
+\brief
+Adding noise every nth bit based on user input.
+\return none
+*****************************************************************************/
 static int Channelutils_AddDeterministicNoise()
 {
     static int counter = 0;

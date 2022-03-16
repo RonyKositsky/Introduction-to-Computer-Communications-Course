@@ -119,6 +119,21 @@ void ServerUtils_PrintOutput()
 	printf("Detected and corrected %d errors\n", ServerParams_s.bytes_fixed);
 }
 
+
+/*!
+******************************************************************************
+\brief
+ Initializing new server session.
+\return none
+*****************************************************************************/
+void ServerUtils_SessionInit()
+{
+	SenderUtils_OpenFile();
+	if (ServerParams_s.quit) return;
+	ServerParams_s.socket = SocketTools_CreateSocket(ServerArgs_s.ip, ServerArgs_s.port, CLIENT);
+}
+
+
 /************************************
 * static implementation             *
 ************************************/
@@ -160,7 +175,13 @@ uint32_t ServerUtils_StripHammingCode(uint32_t msg)
 	return ret;
 }
 
-void SenderUtils_OpenFile()
+/*!
+******************************************************************************
+\brief
+Opening the file. If "quit" is entered we finish the procedure.
+\return none.
+*****************************************************************************/
+static void SenderUtils_OpenFile()
 {
 	printf("File name:");
 	ASSERT(scanf("%s", ServerParams_s.filename) == 1, "Error in response in server");
@@ -173,9 +194,3 @@ void SenderUtils_OpenFile()
 	ServerParams_s.quit = true;
 }
 
-void ServerUtils_SessionInit()
-{
-	SenderUtils_OpenFile();
-	if (ServerParams_s.quit) return;
-	ServerParams_s.socket = SocketTools_CreateSocket(ServerArgs_s.ip, ServerArgs_s.port, CLIENT);
-}

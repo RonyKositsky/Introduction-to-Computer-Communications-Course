@@ -60,15 +60,16 @@ SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType type)
 /*!
 ******************************************************************************
 \brief
-Reading message via socket.
+Reading message size via socket.
 \param
- [in] msgVars - The message arguments struct.
-\return the number of bits recieved.
+ [in] socket    - The socket we are reading from.
+ [in] message_p - Pointer to the message we will save the message to.
+\return none.
 *****************************************************************************/
 void SocketTools_ReadMessageSize(SOCKET socket, uint32_t *message_size)
 {
 	uint32_t rm = 0;
-	ASSERT(recv(socket, &rm, sizeof(uint32_t), 0) == SUCCESS, "Error in recieving message size.");
+	ASSERT(recv(socket, &rm, sizeof(uint32_t), 0) >= SUCCESS, "Error in recieving message size.");
 	*message_size = ntohl(rm);
 }
 
@@ -77,13 +78,14 @@ void SocketTools_ReadMessageSize(SOCKET socket, uint32_t *message_size)
 \brief
 Sending message via socket.
 \param
- [in] msgVars - The message arguments struct.
-\return the number of bits sent.
+ [in] socket - the sending socket.
+ [in] message_size - the size.
+\return none.
 *****************************************************************************/
 void SocketTools_SendMessageSize(SOCKET socket, uint32_t message_size)
 {
 	uint32_t un = htonl(message_size);
-	ASSERT(send(socket, &un, sizeof(uint32_t), 0) == SUCCESS, "Error in sending message size.");
+	ASSERT(send(socket, &un, sizeof(uint32_t), 0) >= SUCCESS, "Error in sending message size.");
 }
 
 /*!
@@ -91,25 +93,29 @@ void SocketTools_SendMessageSize(SOCKET socket, uint32_t message_size)
 \brief
 Sending message via socket.
 \param
- [in] msgVars - The message arguments struct.
-\return the number of bits sent.
+ [in] socket   - the socket we are sending to.
+ [in] message  - the message.
+ [in] size  - message size.
+\return none.
 *****************************************************************************/
 void SocketTools_SendMessage(SOCKET socket, char *message, int size)
 {
-	ASSERT(send(socket, message, size, 0) == SUCCESS, "Error in sending message.");
+	ASSERT(send(socket, message, size, 0) >= SUCCESS, "Error in sending message.");
 }
 
 /*!
 ******************************************************************************
 \brief
-Reading message via socket.
+Reading size via socket.
 \param
- [in] msgVars - The message arguments struct.
-\return the number of bits recieved.
+ [in] socket   - the socket we are reading from.
+ [in] message  - message buffer.
+ [in] size  - message size.
+\return none.
 *****************************************************************************/
 void SocketTools_ReadMessage(SOCKET socket, char* message, int size)
 {
-	ASSERT(recv(socket, message, size, 0) == SUCCESS, "Error in reading message.");
+	ASSERT(recv(socket, message, size, 0) >= SUCCESS, "Error in reading message.");
 }
 
 
