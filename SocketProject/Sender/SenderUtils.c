@@ -105,7 +105,7 @@ void SenderUtils_InitSession()
 {
 	SenderUtils_OpenFile();
 	if (SenderParams_s.quit) return;
-	SenderParams_s.socket = SocketTools_CreateSocket(SenderArgs_s.ip, SenderArgs_s.port, CLIENT);
+	SenderParams_s.socket = SocketTools_CreateSocket(SenderArgs_s.ip, SenderArgs_s.port, CLIENT, false, SENDER);
 }
 
 

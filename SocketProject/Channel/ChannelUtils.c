@@ -20,8 +20,7 @@
 ************************************/
 #define ERROR_PROB_CONSTANT (2^16)
 #define LOCAL_HOST_IP "127.0.0.1"
-#define SENDER_PORT 6342
-#define SERVER_PORT 6343
+#define IP_LISTEN_ALL "0.0.0.0"
 
 /************************************
 *       types                       *
@@ -75,11 +74,9 @@ void ChannelUtils_ChannelInit(int argc, char* argv[])
     }
         
     ChParams_s.ip = LOCAL_HOST_IP;
-    ChParams_s.sender_port = SENDER_PORT;
-    ChParams_s.server_port = SERVER_PORT;
-
-    printf("sender socket : IP address = %s port = %d\n", ChParams_s.ip, ChParams_s.sender_port);
-    printf("receiver socket : IP address = %s port = %d\n", ChParams_s.ip, ChParams_s.server_port);}
+    ChParams_s.sender_port = 0;
+    ChParams_s.server_port = 0;
+}
 
 /*!
 ******************************************************************************
@@ -87,17 +84,15 @@ void ChannelUtils_ChannelInit(int argc, char* argv[])
 Initializing new session. Channel behave like 2 way server.
 \return none
 *****************************************************************************/
-void ChannelUtils_InitSession()
+void ChannelUtils_InitSession(bool firstIteration)
 {
     ChParams_s.message_size = 0;
     ChParams_s.flipped_bits = 0;
 
-    // Init sender connection.
-    ChParams_s.sender_sock = SocketTools_CreateSocket(ChParams_s.ip, ChParams_s.sender_port, SERVER);
-    ChParams_s.sender_accepted_sock = accept(ChParams_s.sender_sock, NULL, NULL);
+    ChParams_s.sender_sock = SocketTools_CreateSocket(ChParams_s.ip, ChParams_s.sender_port, SERVER, firstIteration, SENDER);
+    ChParams_s.server_sock = SocketTools_CreateSocket(ChParams_s.ip, ChParams_s.server_port, SERVER, firstIteration, RECIEVER);
 
-    // Init server connection.
-    ChParams_s.server_sock = SocketTools_CreateSocket(ChParams_s.ip, ChParams_s.server_port, SERVER);
+    ChParams_s.sender_accepted_sock = accept(ChParams_s.sender_sock, NULL, NULL);
     ChParams_s.server_accepted_sock = accept(ChParams_s.server_sock, NULL, NULL);
 }
 

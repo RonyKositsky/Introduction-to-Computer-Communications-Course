@@ -43,7 +43,6 @@ uint32_t BitTools_ConvertStringToUint(char* massage, bool hammingAddition)
 		}
 		else
 		{
-			char a = massage[msg_index];
 			if (massage[msg_index] == '1')
 				BIT_SET(val, i);
 			msg_index++;

@@ -29,7 +29,7 @@
 Initializing new socket.
 \return SOCKET.
 *****************************************************************************/
-SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType type)
+SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType sockType, bool printData, ClientType clientType)
 {
 	WSADATA wsaData;
 	WORD wVersionRequested = MAKEWORD(2, 2);
@@ -44,13 +44,27 @@ SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType type)
 	sa.sin_port = htons(port);
 	sa.sin_addr.s_addr = inet_addr(ip);
 
-	if (type == CLIENT)
+	if (sockType == CLIENT)
 	{
 		ASSERT(connect(sockfd, (SOCKADDR*)&sa, sizeof(struct sockaddr)) == SUCCESS, "Error in connect() function.");
 	}
 	else
 	{
 		ASSERT(bind(sockfd, (SOCKADDR*)&sa, sizeof(struct sockaddr)) == SUCCESS, "Error in bind() function.");
+
+		if (printData)
+		{
+			ASSERT(getsockname(sockfd, (SOCKADDR*)&sa, sizeof(struct sockaddr)) == SUCCESS, "Error in getsockname() function.");
+			if (clientType == SENDER)
+			{
+				printf("sender socket : IP address = %s port = %d\n", sa.sin_addr, sa.sin_port);
+			}
+			else 
+			{
+				printf("receiver socket : IP address = %s port = %d\n", sa.sin_addr, sa.sin_port);
+			}
+		}
+
 		ASSERT(listen(sockfd, SOMAXCONN) == SUCCESS, "Error in listen() function.");
 	}
 

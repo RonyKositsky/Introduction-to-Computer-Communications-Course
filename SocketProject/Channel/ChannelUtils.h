@@ -66,7 +66,7 @@ void ChannelUtils_ChannelInit(int argc, char* argv[]);
 Initializing new session.
 \return none
 *****************************************************************************/
-void ChannelUtils_InitSession();
+void ChannelUtils_InitSession(bool firstIteration);
 
 /*!
 ******************************************************************************

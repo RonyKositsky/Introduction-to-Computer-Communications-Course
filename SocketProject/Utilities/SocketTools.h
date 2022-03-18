@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <winsock2.h>
 #include "Definitions.h"
+#include <stdbool.h>
 
 /************************************
 *       API                         *
@@ -25,7 +26,7 @@
 Initializing new socket.
 \return SOCKET.
 *****************************************************************************/
-SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType type);
+SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType sockType, bool printData, ClientType clientType);
 
 /*!
 ******************************************************************************

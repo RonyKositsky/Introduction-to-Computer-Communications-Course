@@ -130,7 +130,7 @@ void ServerUtils_SessionInit()
 {
 	SenderUtils_OpenFile();
 	if (ServerParams_s.quit) return;
-	ServerParams_s.socket = SocketTools_CreateSocket(ServerArgs_s.ip, ServerArgs_s.port, CLIENT);
+	ServerParams_s.socket = SocketTools_CreateSocket(ServerArgs_s.ip, ServerArgs_s.port, CLIENT, false, RECIEVER);
 }
 
 

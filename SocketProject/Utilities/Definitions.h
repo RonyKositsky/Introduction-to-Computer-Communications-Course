@@ -39,8 +39,15 @@
 
 typedef enum
 {
-	CLIENT,
+	CLIENT = 0,
 	SERVER
 }SocketType;
+
+
+typedef enum
+{
+	RECIEVER = 0,
+	SENDER
+}ClientType;
 
 #endif //__SOCKET_TOOLS_H__
