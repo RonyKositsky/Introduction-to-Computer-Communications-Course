@@ -117,7 +117,7 @@ void ChannelUtils_AddNoiseToMessage()
         }
 
         // Add noise.
-        msg =  BitTools_ConvertStringToUint(buf, false);
+        msg =  BitTools_ConvertStringToUint(buf);
         noise = ChParams_s.noise_type == RANDOM ? Channelutils_AddRandomNoise() : Channelutils_AddDeterministicNoise();
         noisy_msg = msg ^ noise;
 

@@ -25,46 +25,19 @@
 Adding to recieved message 5 pairity bits.
 \return Message with uninitialized hamming code.
 *****************************************************************************/
-uint32_t BitTools_ConvertStringToUint(char* massage, bool hammingAddition)
+uint32_t BitTools_ConvertStringToUint(char* massage)
 {
 	uint32_t val = 0; 
-	int i = 0;
 	int hamming_index = 0;
 	int	msg_index = 0;
 
-	if (massage == NULL)
-		return 0;
-
 	for (int i = 0; i < HAMM_MSG_SIZE; i++)
 	{
-		if (hammingAddition && i == HammingPairingBitsIndexes[hamming_index])
-		{
-			hamming_index++;
-		}
-		else
-		{
-			if (massage[msg_index] == '1')
-				BIT_SET(val, i);
-			msg_index++;
-		}
+		if (massage[i] == '1')
+			BIT_SET(val, i);
 	}
 
 	return val;
-}
-
-/*!
-******************************************************************************
-\brief
-Adding to recieved message 5 pairity bits.
-\return Message with uninitialized hamming code.
-*****************************************************************************/
-void BitTools_ConvertUintToString(char* massage, int numberOfBits, uint32_t num)
-{
-	for (int i = 0; i < numberOfBits; i++)
-	{
-		massage[i] = (num & (int)1 << (numberOfBits - i - 1)) ? '1' : '0';
-	}
-	massage[num] = '\0';
 }
 
 /*!

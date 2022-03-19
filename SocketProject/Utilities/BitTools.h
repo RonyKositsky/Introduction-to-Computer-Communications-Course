@@ -48,36 +48,8 @@ static int HammingMasks[HAMM_PAIRITY_BITS] =
 *       API                         *
 ************************************/
 
-/*!
-******************************************************************************
-\brief
-Adding to recieved message 5 pairity bits.
-\return Message with uninitialized hamming code.
-*****************************************************************************/
-uint32_t BitTools_ConvertStringToUint(char *massage, bool hammingAddition);
-
-/*!
-******************************************************************************
-\brief
-Adding to recieved message 5 pairity bits.
-\return Message with uninitialized hamming code.
-*****************************************************************************/
-void BitTools_ConvertUintToString(char* massage, int numberOfBits, uint32_t num);
-
-/*!
-******************************************************************************
-\brief
-Adding to recieved message 5 pairity bits.
-\return Message with uninitialized hamming code.
-*****************************************************************************/
+uint32_t BitTools_ConvertStringToUint(char *massage);
 int BitTools_BitwiseXOR(uint32_t num);
-
-/*!
-******************************************************************************
-\brief
-Getting the nth bit of the num.
-\return bit value.
-*****************************************************************************/
 int BitTools_GetNBit(uint32_t num, int n);
 
 #endif //__BIT_TOOLS_H__

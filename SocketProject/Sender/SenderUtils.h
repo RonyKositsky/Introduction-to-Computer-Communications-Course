@@ -34,47 +34,10 @@ extern SenderParams SenderParams_s;
 /************************************
 *       API                         *
 ************************************/
-
-/*!
-******************************************************************************
-\brief
-Initialize the sender.
-\param
- [in] argv - arguments from the user.
-\return none
-*****************************************************************************/
 void SenderUtils_SenderInit(char* argv[]);
-
-/*!
-******************************************************************************
-\brief
-Reading from the input file the next 26 bits.
-\return Number of bits read.
-*****************************************************************************/
 void  SenderUtils_ReadingFile();
-
-/*!
-******************************************************************************
-\brief
-Getting file name from the user.
-\return none
-*****************************************************************************/
 void SenderUtils_OpenFile();
-
-/*!
-******************************************************************************
-\brief
-Initialize sender new session.
-\return none
-*****************************************************************************/
 void SenderUtils_InitSession();
-
-/*!
-******************************************************************************
-\brief
-Printing statistics and relevant data.
-\return none
-*****************************************************************************/
 void SenderUtils_PrintOutput();
 
 #endif //__SENDER_UTILS_H__

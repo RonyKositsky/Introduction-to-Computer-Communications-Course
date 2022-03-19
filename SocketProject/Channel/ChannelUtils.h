@@ -50,46 +50,10 @@ extern ChannelParams ChParams_s;
 *       API                         *
 ************************************/
 
-/*!
-******************************************************************************
-\brief
-Initialize the channel.
-\param
- [in] argv - arguments from the user.
-\return none
-*****************************************************************************/
 void ChannelUtils_ChannelInit(int argc, char* argv[]);
-
-/*!
-******************************************************************************
-\brief
-Initializing new session.
-\return none
-*****************************************************************************/
 void ChannelUtils_InitSession(bool firstIteration);
-
-/*!
-******************************************************************************
-\brief
-Adding noise to recieved message.
-\return none
-*****************************************************************************/
 void ChannelUtils_AddNoiseToMessage();
-
-/*!
-******************************************************************************
-\brief
-Adding noise to recieved message.
-\return none
-*****************************************************************************/
 void ChannelUtils_AskToContinue();
-
-/*!
-******************************************************************************
-\brief
-Adding noise to recieved message.
-\return none
-*****************************************************************************/
 void ChannelUtils_PrintStatistics();
 
 #endif //__CHANNEL_UTILS_H__

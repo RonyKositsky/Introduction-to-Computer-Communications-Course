@@ -83,7 +83,7 @@ void ServerUtils_WriteToFile()
 		}
 
 		// remove noise.
-		msg = BitTools_ConvertStringToUint(buf, false);
+		msg = BitTools_ConvertStringToUint(buf);
 		recovered_message = ServerUtils_StripHammingCode(msg);
 
 		// Add to sent buffer.

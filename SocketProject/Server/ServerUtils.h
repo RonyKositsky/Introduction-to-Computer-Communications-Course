@@ -38,38 +38,9 @@ extern ServerParams ServerParams_s;
 *       API                         *
 ************************************/
 
-/*!
-******************************************************************************
-\brief
-Initialize the server.
-\param
- [in] argv - User input.
-\return none
-*****************************************************************************/
 void ServerUtils_ServerInit(char* argv[]);
-
-/*!
-******************************************************************************
-\brief
- Initializing new server session.
-\return none
-*****************************************************************************/
 void ServerUtils_SessionInit();
-
-/*!
-******************************************************************************
-\brief
-Printing relevant data and statistics.
-\return none
-*****************************************************************************/
 void ServerUtils_PrintOutput();
-
-/*!
-******************************************************************************
-\brief
-Printing relevant data and statistics.
-\return none
-*****************************************************************************/
 void ServerUtils_WriteToFile();
 
 #endif //__SERVER_UTILSw_H__

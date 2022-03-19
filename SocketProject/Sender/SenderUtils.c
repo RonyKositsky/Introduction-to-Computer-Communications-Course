@@ -20,7 +20,8 @@
 *      definitions                 *
 ************************************/
 #define MAX_LIMIT 1000
-
+#define NUMBER_OF_WORDS 8
+#define CHAR_LENGTH 8
 /************************************
 *       types                       *
 ************************************/
@@ -41,6 +42,8 @@ SenderParams SenderParams_s;
 ************************************/
 static void SenderUtils_GetMessageSize();
 static void SenderUtils_AddHammCode();
+static void SenderUtils_AddHammCode();
+static void SenderUtils_AddMessageToBuffer(uint32_t message);
 
 /************************************
 *       API implementation          *
@@ -74,6 +77,7 @@ Reading from the input file the next 26 bits.
 *****************************************************************************/
 void SenderUtils_ReadingFile()
 {
+
 	SenderUtils_GetMessageSize();
 	SenderUtils_AddHammCode();
 	fclose(SenderParams_s.file);
@@ -85,7 +89,7 @@ void SenderUtils_OpenFile()
 	ASSERT(scanf("%s", SenderParams_s.filename) == 1, "Error in scanning file");
 	if (strcmp(SenderParams_s.filename, "quit")) // returns 1 if they are not equal.
 	{
-		SenderParams_s.file = fopen(SenderParams_s.filename, "rb");
+		SenderParams_s.file = fopen(SenderParams_s.filename, "r");
 		ASSERT(SenderParams_s.file != NULL, "Error in open file in sender.");
 		return;
 	}
@@ -182,23 +186,60 @@ Preparing the sent message to be sent.
 *****************************************************************************/
 static void SenderUtils_AddHammCode()
 {
-	size_t err, index = 0;
-	uint32_t msg, messageHamming;
+	size_t err;
+	uint32_t msg;
+
+	// Reading 26 bytes, meaning 26*8 = 208 bits.
 	while (err = fread(SenderParams_s.msg_buffer, 1, MSG_SIZE, SenderParams_s.file))
 	{
-		if (err < 0)
-		{
-			fprintf(stderr, "Read from file failed.\n");
-			exit(-1);
-		}
+		ASSERT(err >= 0, "Read from file failed.\n");
+		int	curr_word = 0;
+		int char_index = 0;
 
-		msg   = BitTools_ConvertStringToUint(SenderParams_s.msg_buffer, true);
-		messageHamming = BitTools_GetMassageWithHamming(msg);
-
-		for (int i = 0; i < HAMM_MSG_SIZE; i++)
+		for (int word = 0; word < NUMBER_OF_WORDS; word++)
 		{
-			SenderParams_s.sent_message[index] = BitTools_GetNBit(messageHamming, i) == 0 ? '0' : '1';
-			index ++;
+			uint32_t val = 0;
+			int hamming_index = 0;
+
+			for (int i = 0; i < HAMM_MSG_SIZE; i++)
+			{
+				if (i == HammingPairingBitsIndexes[hamming_index])
+				{
+					hamming_index++;
+					continue;
+				}
+				if ((SenderParams_s.msg_buffer[curr_word] && ((char_index << 1) - 1)) == 1) // Getting the bit.
+				{
+					BIT_SET(val, i);
+				}
+
+				if (++char_index == CHAR_LENGTH)
+				{
+					char_index = 0;
+					curr_word++;
+				}
+			}
+
+			msg = BitTools_ConvertStringToUint(SenderParams_s.msg_buffer);
+			SenderUtils_AddMessageToBuffer(msg);
 		}
 	}	
+}
+
+/*!
+******************************************************************************
+\brief
+Adding hamming pairty bits and adding them to buffer.
+\return none.
+*****************************************************************************/
+static void SenderUtils_AddMessageToBuffer(uint32_t message)
+{
+	static int index = 0;
+	uint32_t messageHamming = BitTools_GetMassageWithHamming(message);
+
+	for (int i = 0; i < HAMM_MSG_SIZE; i++)
+	{
+		SenderParams_s.sent_message[index] = BitTools_GetNBit(messageHamming, i) == 0 ? '0' : '1';
+		index++;
+	}
 }
