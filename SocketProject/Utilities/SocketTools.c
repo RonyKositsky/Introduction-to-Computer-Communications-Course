@@ -29,12 +29,12 @@
 Initializing new socket.
 \return SOCKET.
 *****************************************************************************/
-SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType sockType, bool printData, ClientType clientType)
+SOCKET SocketTools_CreateSocket(char *ip, int port, SocketType sockType, bool printData, ClientType clientType)
 {
 	WSADATA wsaData;
 	WORD wVersionRequested = MAKEWORD(2, 2);
-	ASSERT( WSAStartup(wVersionRequested, &wsaData) == SUCCESS,  "WSAStartup failed");
-	
+	ASSERT(WSAStartup(wVersionRequested, &wsaData) == SUCCESS, "WSAStartup failed");
+
 	SOCKET sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	ASSERT(sockfd != INVALID_SOCKET, "Failed to create socket.");
 
@@ -47,20 +47,20 @@ SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType sockType, bool pr
 
 	if (sockType == CLIENT)
 	{
-		ASSERT(connect(sockfd, (SOCKADDR*)&sa, sizeof(struct sockaddr)) == SUCCESS, "Error in connect() function.");
+		ASSERT(connect(sockfd, (SOCKADDR *)&sa, sizeof(struct sockaddr)) == SUCCESS, "Error in connect() function.");
 	}
 	else
 	{
-		ASSERT(bind(sockfd, (SOCKADDR*)&sa, sizeof(struct sockaddr)) == SUCCESS, "Error in bind() function.");
+		ASSERT(bind(sockfd, (SOCKADDR *)&sa, sizeof(struct sockaddr)) == SUCCESS, "Error in bind() function.");
 
 		if (printData)
 		{
-			ASSERT(getsockname(sockfd, (SOCKADDR*)&sa, &adrlen) == SUCCESS, "Error in getsockname() function.");
+			ASSERT(getsockname(sockfd, (SOCKADDR *)&sa, &adrlen) == SUCCESS, "Error in getsockname() function.");
 			if (clientType == SENDER)
 			{
 				printf("sender socket : IP address = %s port = %d\n", inet_ntoa(sa.sin_addr), sa.sin_port);
 			}
-			else 
+			else
 			{
 				printf("receiver socket : IP address = %s port = %d\n", inet_ntoa(sa.sin_addr), sa.sin_port);
 			}
@@ -128,13 +128,7 @@ Reading size via socket.
  [in] size  - message size.
 \return none.
 *****************************************************************************/
-void SocketTools_ReadMessage(SOCKET socket, char* message, int size)
+void SocketTools_ReadMessage(SOCKET socket, char *message, int size)
 {
 	ASSERT(recv(socket, message, size, 0) >= SUCCESS, "Error in reading message.");
 }
-
-
-
-
-
-
