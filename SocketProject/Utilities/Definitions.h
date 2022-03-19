@@ -27,6 +27,9 @@
 #define FIFTH_PAIRITY_MASK		  (0x7FFF8000) //(01111111111111111000000000000000)
 
 #define ACK (0x80000000)
+#define DEBUG (0);
+#define BYTE_LENGTH 8
+#define LOCAL_HOST_IP "127.0.0.1"
 
 #define ASSERT(cond, msg, ...)																 \
 		if (!(cond))																		 \

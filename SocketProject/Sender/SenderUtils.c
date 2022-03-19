@@ -21,7 +21,7 @@
 ************************************/
 #define MAX_LIMIT 1000
 #define NUMBER_OF_WORDS 8
-#define CHAR_LENGTH 8
+
 /************************************
 *       types                       *
 ************************************/
@@ -66,6 +66,9 @@ void SenderUtils_SenderInit(char* argv[])
 	//SenderArgs_s.ip = argv[1];
 	//SenderArgs_s.port = atoi(argv[2]);
 
+	SenderArgs_s.ip = "127.0.0.1";
+	SenderArgs_s.port = 6342;
+
 	SenderUtils_InitSession();
 }
 
@@ -77,7 +80,6 @@ Reading from the input file the next 26 bits.
 *****************************************************************************/
 void SenderUtils_ReadingFile()
 {
-
 	SenderUtils_GetMessageSize();
 	SenderUtils_AddHammCode();
 	fclose(SenderParams_s.file);
@@ -106,7 +108,7 @@ void SenderUtils_InitSession()
 {
 	SenderUtils_OpenFile();
 	if (SenderParams_s.quit) return;
-	//SenderParams_s.socket = SocketTools_CreateSocket(SenderArgs_s.ip, SenderArgs_s.port, CLIENT, false, SENDER);
+	SenderParams_s.socket = SocketTools_CreateSocket(SenderArgs_s.ip, SenderArgs_s.port, CLIENT, false, SENDER);
 }
 
 
@@ -118,8 +120,8 @@ Printing statistics and relevant data.
 *****************************************************************************/
 void SenderUtils_PrintOutput()
 {
-	printf("file length : %d bytes\n", SenderParams_s.message_size / 31 * 26);
-	printf("bytes sent  : %d bytes\n", SenderParams_s.message_size);
+	printf("file length : %d bytes\n", SenderParams_s.message_size / (8 * 31) * 26 );
+	printf("bytes sent  : %d bytes\n", SenderParams_s.message_size / 8);
 	 
 }
 
@@ -174,7 +176,7 @@ static void SenderUtils_GetMessageSize()
 	}
 
 	rewind(SenderParams_s.file);
-	SenderParams_s.message_size = (int)message_chunks * HAMM_MSG_SIZE;
+	SenderParams_s.message_size = (int)message_chunks * HAMM_MSG_SIZE * 8;
 	SenderParams_s.sent_message = (char*)malloc(SenderParams_s.message_size * sizeof(char));
 }
 
@@ -214,7 +216,7 @@ static void SenderUtils_AddHammCode()
 					BIT_SET(msg, i);
 				}
 
-				if (++char_index == CHAR_LENGTH)
+				if (++char_index == BYTE_LENGTH)
 				{
 					char_index = 0;
 					curr_word++;

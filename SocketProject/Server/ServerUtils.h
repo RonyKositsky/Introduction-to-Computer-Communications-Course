@@ -29,7 +29,7 @@ typedef struct
 	char filename[FILE_NAME_BUFFER];
 	bool quit;
 	char* message;
-	int bytes_fixed;
+	int bits_fixed;
 }ServerParams;
 
 extern ServerParams ServerParams_s;

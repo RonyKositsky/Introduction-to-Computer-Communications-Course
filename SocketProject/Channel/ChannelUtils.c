@@ -19,7 +19,6 @@
 *      definitions                  *
 ************************************/
 #define ERROR_PROB_CONSTANT (2^16)
-#define LOCAL_HOST_IP "127.0.0.1"
 #define IP_LISTEN_ALL "0.0.0.0"
 
 /************************************
@@ -73,9 +72,9 @@ void ChannelUtils_ChannelInit(int argc, char* argv[])
         ChParams_s.noise_type = DETERMINISTIC;
     }
         
-    ChParams_s.ip = IP_LISTEN_ALL;
-    ChParams_s.sender_port = 0;
-    ChParams_s.server_port = 0;
+    ChParams_s.ip = LOCAL_HOST_IP; 
+    ChParams_s.sender_port = 6342;
+    ChParams_s.server_port = 6343;
 }
 
 /*!
@@ -140,11 +139,7 @@ void ChannelUtils_AskToContinue()
 {
     char response[10]; // Big enough buffer.
     printf("continue? (yes/no)\n");
-    if (scanf("%s", response) < 0)
-    {
-        printf("Error in scanning answer.");
-        exit(-1);
-    }
+    ASSERT(scanf("%s", response) >= 0, "Error in scanning answer.");
     ChParams_s.quit = strncmp(response, "yes", 10);
 }
 
