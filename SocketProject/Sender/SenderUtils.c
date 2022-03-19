@@ -60,11 +60,8 @@ void SenderUtils_SenderInit(char* argv[])
 	memset(&SenderParams_s, 0, sizeof(SenderParams));
 
 	// Reading user input.
-	/*SenderArgs_s.ip = argv[1];
-	SenderArgs_s.port = atoi(argv[2]);*/
-
-	SenderArgs_s.ip = "127.0.0.1";
-	SenderArgs_s.port = 6342;
+	SenderArgs_s.ip = argv[1];
+	SenderArgs_s.port = atoi(argv[2]);
 
 	SenderUtils_InitSession();
 }

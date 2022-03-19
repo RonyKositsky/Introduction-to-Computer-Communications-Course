@@ -73,7 +73,7 @@ void ChannelUtils_ChannelInit(int argc, char* argv[])
         ChParams_s.noise_type = DETERMINISTIC;
     }
         
-    ChParams_s.ip = LOCAL_HOST_IP;
+    ChParams_s.ip = IP_LISTEN_ALL;
     ChParams_s.sender_port = 0;
     ChParams_s.server_port = 0;
 }

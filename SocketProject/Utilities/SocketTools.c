@@ -43,6 +43,7 @@ SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType sockType, bool pr
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons(port);
 	sa.sin_addr.s_addr = inet_addr(ip);
+	int adrlen = sizeof(SOCKADDR);
 
 	if (sockType == CLIENT)
 	{
@@ -54,14 +55,14 @@ SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType sockType, bool pr
 
 		if (printData)
 		{
-			ASSERT(getsockname(sockfd, (SOCKADDR*)&sa, sizeof(struct sockaddr)) == SUCCESS, "Error in getsockname() function.");
+			ASSERT(getsockname(sockfd, (SOCKADDR*)&sa, &adrlen) == SUCCESS, "Error in getsockname() function.");
 			if (clientType == SENDER)
 			{
-				printf("sender socket : IP address = %s port = %d\n", sa.sin_addr, sa.sin_port);
+				printf("sender socket : IP address = %s port = %d\n", inet_ntoa(sa.sin_addr), sa.sin_port);
 			}
 			else 
 			{
-				printf("receiver socket : IP address = %s port = %d\n", sa.sin_addr, sa.sin_port);
+				printf("receiver socket : IP address = %s port = %d\n", inet_ntoa(sa.sin_addr), sa.sin_port);
 			}
 		}
 
