@@ -63,8 +63,8 @@ void SenderUtils_SenderInit(char* argv[])
 	memset(&SenderParams_s, 0, sizeof(SenderParams));
 
 	// Reading user input.
-	SenderArgs_s.ip = argv[1];
-	SenderArgs_s.port = atoi(argv[2]);
+	//SenderArgs_s.ip = argv[1];
+	//SenderArgs_s.port = atoi(argv[2]);
 
 	SenderUtils_InitSession();
 }
@@ -106,7 +106,7 @@ void SenderUtils_InitSession()
 {
 	SenderUtils_OpenFile();
 	if (SenderParams_s.quit) return;
-	SenderParams_s.socket = SocketTools_CreateSocket(SenderArgs_s.ip, SenderArgs_s.port, CLIENT, false, SENDER);
+	//SenderParams_s.socket = SocketTools_CreateSocket(SenderArgs_s.ip, SenderArgs_s.port, CLIENT, false, SENDER);
 }
 
 
@@ -198,7 +198,7 @@ static void SenderUtils_AddHammCode()
 
 		for (int word = 0; word < NUMBER_OF_WORDS; word++)
 		{
-			uint32_t val = 0;
+			uint32_t msg = 0;
 			int hamming_index = 0;
 
 			for (int i = 0; i < HAMM_MSG_SIZE; i++)
@@ -208,9 +208,10 @@ static void SenderUtils_AddHammCode()
 					hamming_index++;
 					continue;
 				}
-				if ((SenderParams_s.msg_buffer[curr_word] && ((char_index << 1) - 1)) == 1) // Getting the bit.
+
+				if (SenderParams_s.msg_buffer[curr_word] >> char_index & 0x1) // Getting the bit.
 				{
-					BIT_SET(val, i);
+					BIT_SET(msg, i);
 				}
 
 				if (++char_index == CHAR_LENGTH)
@@ -220,7 +221,6 @@ static void SenderUtils_AddHammCode()
 				}
 			}
 
-			msg = BitTools_ConvertStringToUint(SenderParams_s.msg_buffer);
 			SenderUtils_AddMessageToBuffer(msg);
 		}
 	}	
