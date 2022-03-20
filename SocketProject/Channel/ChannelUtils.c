@@ -161,7 +161,7 @@ static uint32_t Channelutils_AddRandomNoise()
     bool flip = false;
     for (int bit = 0; bit < HAMM_MSG_SIZE - 1; bit++)
     {
-        flip = rand() % 100 < (ChArgs_s.prob * 100);
+        flip = ((float)rand() / (float)(RAND_MAX)) <= (ChArgs_s.prob);
         if (!flip) continue;
         BIT_FLIP(noise, bit);
         ChParams_s.flipped_bits++;
