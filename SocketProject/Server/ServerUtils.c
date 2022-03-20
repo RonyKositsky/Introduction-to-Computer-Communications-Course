@@ -55,11 +55,10 @@ void ServerUtils_ServerInit(char* argv[])
 	memset(&ServerParams_s, 0, sizeof(ServerParams));
 
 	// Rading values from user.
-	//ServerArgs_s.ip = argv[1];
-	//ServerArgs_s.port = atoi(argv[2]);
+	ServerArgs_s.ip = argv[1];
+	ServerArgs_s.port = atoi(argv[2]);
 
-	ServerArgs_s.ip = LOCAL_HOST_IP;
-	ServerArgs_s.port = 6343;
+	printf("%s %d\n", ServerArgs_s.ip, ServerArgs_s.port);
 
 	ServerUtils_SessionInit();
 }
@@ -142,9 +141,12 @@ void ServerUtils_PrintOutput()
 *****************************************************************************/
 void ServerUtils_SessionInit()
 {
+	ServerParams_s.bits_fixed = 0;
+	ServerParams_s.message_size = 0;
+
 	SenderUtils_OpenFile();
 	if (ServerParams_s.quit) return;
-	ServerParams_s.socket = SocketTools_CreateSocket(ServerArgs_s.ip, ServerArgs_s.port, CLIENT, false, RECIEVER);
+	ServerParams_s.socket = SocketTools_CreateSocket(ServerArgs_s.ip, ServerArgs_s.port, CLIENT, RECIEVER);
 }
 
 
@@ -165,9 +167,7 @@ uint32_t ServerUtils_StripHammingCode(uint32_t msg)
 
 	// We will use the 3blue1brown method to find the errored index.
 	// We will go from the highest index, and if there is difference in the pairty we will add 2^i.
-	int i = 0;
 	int index = -1;
-	int index2 = 0;
 	uint32_t masked;
 	for (int j = HAMM_PAIRITY_BITS - 1; j >= 0; j--)
 	{
@@ -177,7 +177,6 @@ uint32_t ServerUtils_StripHammingCode(uint32_t msg)
 			error_detected = true;
 			index += (int)pow(2,j);
 		}
-		i++;
 	}
 
 	if (error_detected)

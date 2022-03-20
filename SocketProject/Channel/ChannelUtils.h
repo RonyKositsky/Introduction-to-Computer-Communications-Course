@@ -51,7 +51,7 @@ extern ChannelParams ChParams_s;
 ************************************/
 
 void ChannelUtils_ChannelInit(int argc, char* argv[]);
-void ChannelUtils_InitSession(bool firstIteration);
+void ChannelUtils_InitSession();
 void ChannelUtils_AddNoiseToMessage();
 void ChannelUtils_AskToContinue();
 void ChannelUtils_PrintStatistics();

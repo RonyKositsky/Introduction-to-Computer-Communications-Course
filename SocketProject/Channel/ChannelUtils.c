@@ -73,8 +73,12 @@ void ChannelUtils_ChannelInit(int argc, char* argv[])
     }
         
     ChParams_s.ip = LOCAL_HOST_IP; 
-    ChParams_s.sender_port = 6342;
-    ChParams_s.server_port = 6343;
+    ChParams_s.sender_port = 0;
+    ChParams_s.server_port = 0;
+
+
+    ChParams_s.sender_sock = SocketTools_CreateSocket(ChParams_s.ip, ChParams_s.sender_port, SERVER,  SENDER);
+    ChParams_s.server_sock = SocketTools_CreateSocket(ChParams_s.ip, ChParams_s.server_port, SERVER,  RECIEVER);
 }
 
 /*!
@@ -83,16 +87,13 @@ void ChannelUtils_ChannelInit(int argc, char* argv[])
 Initializing new session. Channel behave like 2 way server.
 \return none
 *****************************************************************************/
-void ChannelUtils_InitSession(bool firstIteration)
+void ChannelUtils_InitSession()
 {
     ChParams_s.message_size = 0;
     ChParams_s.flipped_bits = 0;
 
-    ChParams_s.sender_sock = SocketTools_CreateSocket(ChParams_s.ip, ChParams_s.sender_port, SERVER, firstIteration, SENDER);
-    ChParams_s.server_sock = SocketTools_CreateSocket(ChParams_s.ip, ChParams_s.server_port, SERVER, firstIteration, RECIEVER);
-
-    ChParams_s.sender_accepted_sock = accept(ChParams_s.sender_sock, NULL, NULL);
     ChParams_s.server_accepted_sock = accept(ChParams_s.server_sock, NULL, NULL);
+    ChParams_s.sender_accepted_sock = accept(ChParams_s.sender_sock, NULL, NULL);
 }
 
 /*!

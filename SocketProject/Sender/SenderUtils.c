@@ -40,10 +40,12 @@ SenderParams SenderParams_s;
 /************************************
 *      static functions             *
 ************************************/
-static void SenderUtils_GetMessageSize();
+void SenderUtils_GetMessageSize();
 static void SenderUtils_AddHammCode();
 static void SenderUtils_AddHammCode();
 static void SenderUtils_AddMessageToBuffer(uint32_t message);
+
+static int index;
 
 /************************************
 *       API implementation          *
@@ -63,11 +65,8 @@ void SenderUtils_SenderInit(char* argv[])
 	memset(&SenderParams_s, 0, sizeof(SenderParams));
 
 	// Reading user input.
-	//SenderArgs_s.ip = argv[1];
-	//SenderArgs_s.port = atoi(argv[2]);
-
-	SenderArgs_s.ip = "127.0.0.1";
-	SenderArgs_s.port = 6342;
+	SenderArgs_s.ip = argv[1];
+	SenderArgs_s.port = atoi(argv[2]);
 
 	SenderUtils_InitSession();
 }
@@ -82,7 +81,6 @@ void SenderUtils_ReadingFile()
 {
 	SenderUtils_GetMessageSize();
 	SenderUtils_AddHammCode();
-	fclose(SenderParams_s.file);
 }
 
 void SenderUtils_OpenFile()
@@ -91,7 +89,7 @@ void SenderUtils_OpenFile()
 	ASSERT(scanf("%s", SenderParams_s.filename) == 1, "Error in scanning file");
 	if (strcmp(SenderParams_s.filename, "quit")) // returns 1 if they are not equal.
 	{
-		SenderParams_s.file = fopen(SenderParams_s.filename, "r");
+		fopen_s(&SenderParams_s.file, SenderParams_s.filename, "r");
 		ASSERT(SenderParams_s.file != NULL, "Error in open file in sender.");
 		return;
 	}
@@ -106,9 +104,11 @@ Initialize sender new session.
 *****************************************************************************/
 void SenderUtils_InitSession()
 {
+	SenderParams_s.message_size = 0;
+	index = 0;
 	SenderUtils_OpenFile();
 	if (SenderParams_s.quit) return;
-	SenderParams_s.socket = SocketTools_CreateSocket(SenderArgs_s.ip, SenderArgs_s.port, CLIENT, false, SENDER);
+	SenderParams_s.socket = SocketTools_CreateSocket(SenderArgs_s.ip, SenderArgs_s.port, CLIENT, SENDER);
 }
 
 
@@ -121,7 +121,7 @@ Printing statistics and relevant data.
 void SenderUtils_PrintOutput()
 {
 	printf("file length : %d bytes\n", SenderParams_s.message_size / (8 * 31) * 26 );
-	printf("bytes sent  : %d bytes\n", SenderParams_s.message_size / 8);
+	printf("bytes sent : %d bytes\n", SenderParams_s.message_size / 8);
 	 
 }
 
@@ -160,18 +160,13 @@ uint32_t BitTools_GetMassageWithHamming(uint32_t msg)
 Calculating the message size.
 \return none.
 *****************************************************************************/
-static void SenderUtils_GetMessageSize()
+void SenderUtils_GetMessageSize()
 {
 	size_t err, message_chunks = 0;
 	// As said, we can assume that we will get blocks of MSG_SIZE.
 	while (err = fread(SenderParams_s.msg_buffer, 1, MSG_SIZE, SenderParams_s.file))
 	{
-		if (err < 0)
-		{
-			fprintf(stderr, "Read from file failed.\n");
-			exit(-1);
-		}
-
+		ASSERT(err >= 0, fprintf(stderr, "Read from file failed.\n"));
 		message_chunks++;
 	}
 
@@ -236,7 +231,6 @@ Adding hamming pairty bits and adding them to buffer.
 *****************************************************************************/
 static void SenderUtils_AddMessageToBuffer(uint32_t message)
 {
-	static int index = 0;
 	uint32_t messageHamming = BitTools_GetMassageWithHamming(message);
 
 	for (int i = 0; i < HAMM_MSG_SIZE; i++)

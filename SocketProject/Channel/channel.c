@@ -21,11 +21,10 @@ int main(int argc, char* argv[])
 {
     ChannelUtils_ChannelInit(argc, argv);
     uint32_t ack;
-    bool firstIteration = true;
 
     while (!ChParams_s.quit)
     {
-        ChannelUtils_InitSession(firstIteration);
+        ChannelUtils_InitSession();
 
         // Getting message size.
         SocketTools_ReadMessageSize(ChParams_s.sender_accepted_sock, &ChParams_s.message_size);
@@ -51,8 +50,9 @@ int main(int argc, char* argv[])
 
         ChannelUtils_PrintStatistics();
         ChannelUtils_AskToContinue();
-        firstIteration = false;
     }
     
+    closesocket(ChParams_s.sender_port);
+    closesocket(ChParams_s.server_sock);
     return 0;
 }

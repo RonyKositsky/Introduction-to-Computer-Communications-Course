@@ -20,7 +20,7 @@
 *       API                         *
 ************************************/
 
-SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType sockType, bool printData, ClientType clientType);
+SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType sockType, ClientType clientType);
 void SocketTools_ReadMessageSize(SOCKET socket, uint32_t *message_p);
 void SocketTools_SendMessageSize(SOCKET socket, uint32_t message_size);
 void SocketTools_ReadMessage(SOCKET socket, char* message, int size);

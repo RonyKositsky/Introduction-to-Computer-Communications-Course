@@ -30,10 +30,13 @@ int main(int argc, char* argv[])
 		SocketTools_SendMessage(SenderParams_s.socket, SenderParams_s.sent_message, SenderParams_s.message_size);
 
 		closesocket(SenderParams_s.socket);
+		free(SenderParams_s.sent_message);
+		fclose(SenderParams_s.file);
 
 		SenderUtils_PrintOutput();
 		SenderUtils_InitSession();
 	}
+
 
 	return 0;
 }

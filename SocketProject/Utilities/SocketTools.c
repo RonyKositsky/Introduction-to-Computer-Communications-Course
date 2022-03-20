@@ -29,7 +29,7 @@
 Initializing new socket.
 \return SOCKET.
 *****************************************************************************/
-SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType sockType, bool printData, ClientType clientType)
+SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType sockType, ClientType clientType)
 {
 	WSADATA wsaData;
 	WORD wVersionRequested = MAKEWORD(2, 2);
@@ -41,7 +41,7 @@ SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType sockType, bool pr
 	struct sockaddr_in sa;
 
 	sa.sin_family = AF_INET;
-	sa.sin_port = htons(port);
+	sa.sin_port = port;
 	sa.sin_addr.s_addr = inet_addr(ip);
 	int adrlen = sizeof(SOCKADDR);
 
@@ -52,18 +52,14 @@ SOCKET SocketTools_CreateSocket(char* ip, int port, SocketType sockType, bool pr
 	else
 	{
 		ASSERT(bind(sockfd, (SOCKADDR*)&sa, sizeof(struct sockaddr)) == SUCCESS, "Error in bind() function.");
-
-		if (printData)
+		ASSERT(getsockname(sockfd, (SOCKADDR*)&sa, &adrlen) == SUCCESS, "Error in getsockname() function.");
+		if (clientType == SENDER)
 		{
-			ASSERT(getsockname(sockfd, (SOCKADDR*)&sa, &adrlen) == SUCCESS, "Error in getsockname() function.");
-			if (clientType == SENDER)
-			{
-				printf("sender socket : IP address = %s port = %d\n", inet_ntoa(sa.sin_addr), sa.sin_port);
-			}
-			else 
-			{
-				printf("receiver socket : IP address = %s port = %d\n", inet_ntoa(sa.sin_addr), sa.sin_port);
-			}
+			printf("sender socket : IP address = %s port = %d\n", inet_ntoa(sa.sin_addr), sa.sin_port);
+		}
+		else 
+		{
+			printf("receiver socket : IP address = %s port = %d\n", inet_ntoa(sa.sin_addr), sa.sin_port);
 		}
 
 		ASSERT(listen(sockfd, SOMAXCONN) == SUCCESS, "Error in listen() function.");
