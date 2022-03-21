@@ -196,7 +196,7 @@ Opening the file. If "quit" is entered we finish the procedure.
 *****************************************************************************/
 static void SenderUtils_OpenFile()
 {
-	printf("File name:");
+	printf("File name:\n");
 	ASSERT(scanf("%s", ServerParams_s.filename) == 1, "Error in response in server");
 	if (strcmp(ServerParams_s.filename, "quit"))
 	{

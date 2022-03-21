@@ -85,7 +85,7 @@ void SenderUtils_ReadingFile()
 
 void SenderUtils_OpenFile()
 {
-	printf("File name:");
+	printf("File name:\n");
 	ASSERT(scanf("%s", SenderParams_s.filename) == 1, "Error in scanning file");
 	if (strcmp(SenderParams_s.filename, "quit")) // returns 1 if they are not equal.
 	{
