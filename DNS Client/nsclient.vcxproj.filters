@@ -2,5 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="nsclient.c" />
+    <ClCompile Include="dns.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="dns.h" />
+    <ClInclude Include="definitions.h" />
   </ItemGroup>
 </Project>
