@@ -1,9 +1,6 @@
 ﻿  dns.c
-C:\Git\Introduction-to-Computer-Communications-Course\DNS Client\dns.c(70,38): warning C4244: 'function': conversion from 'DWORD' to 'u_short', possible loss of data
-C:\Git\Introduction-to-Computer-Communications-Course\DNS Client\dns.c(93,91): warning C4267: 'function': conversion from 'size_t' to 'int', possible loss of data
-C:\Git\Introduction-to-Computer-Communications-Course\DNS Client\dns.c(95,62): warning C4020: 'perror': too many actual parameters
-C:\Git\Introduction-to-Computer-Communications-Course\DNS Client\dns.c(105,64): warning C4020: 'perror': too many actual parameters
+C:\Git\Introduction-to-Computer-Communications-Course\DNS Client\dns.c(58,91): warning C4267: 'function': conversion from 'size_t' to 'int', possible loss of data
+C:\Git\Introduction-to-Computer-Communications-Course\DNS Client\dns.c(81,38): warning C4244: 'function': conversion from 'DWORD' to 'u_short', possible loss of data
   nsclient.c
-C:\Git\Introduction-to-Computer-Communications-Course\DNS Client\nsclient.c(62,11): warning C4098: 'Init': 'void' function returning a value
   Generating Code...
   nsclient.vcxproj -> C:\Git\Introduction-to-Computer-Communications-Course\DNS Client\x64\Debug\nsclient.exe

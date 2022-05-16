@@ -32,12 +32,10 @@
 /*!
 ******************************************************************************
 \brief
-Initialize func
-\details
-Must be called only once
+Sending query to the DNS server.
 \param
- [in] counter_val - reset counter value
- [out] out_val    -
+ [in] host - desired host.
+ [in] ip - the server ip.
 \return none
 *****************************************************************************/
 void dnsQuery(unsigned char* host, char* ip);

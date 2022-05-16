@@ -20,6 +20,7 @@
 #define T_PTR 12  // domain name pointer 
 #define T_MX 15   // mail server
 #define SUCCESS 0
+#define FAIL 1
 
 /************************************
 *       types                       *

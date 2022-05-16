@@ -4,6 +4,7 @@
 \date 15 May 2022
 \author Jonathan Matetzky & Rony Kosistky
 *****************************************************************************/
+#define _CRT_SECURE_NO_WARNINGS
 
 /************************************
 *      include                      *
@@ -17,56 +18,74 @@
 #define MAX_LEN 1024
 
 /************************************
-*       types                       *
-************************************/
-
-/************************************
 *      variables                    *
 ************************************/
-bool run = false;
+bool run;
 WSADATA wsdata;
+char input[MAX_LEN];
+char* ip;
 
 /************************************
 *      static functions             *
 ************************************/
 static void GetUserArgument();
-static void Init();
+static int Init();
+static bool LegalInput();
 
 /************************************
 *       main			          *
 ************************************/
 int main(int argc, char* argv[])
 {
-	//Init();
-	char* ip = argv[1];
-	char input[MAX_LEN] = "www.google.com";
+	if (Init() || argc != 2)
+	{
+		return FAIL;
+	}
 	
+	ip = argv[1];
+	GetUserArgument();
+	
+	while (run)
+	{
+		if (LegalInput) 
+		{
+			dnsQuery(input, ip);
+		}
 
-	//while (run)
-	//{
-		//GetUserArgument();
-		dnsQuery(input, ip);
-	//}
+		GetUserArgument();
+	}
 
-	return 0;
+	printf("Finised.");
+	WSACleanup();
+	return SUCCESS;
 }
 
 /************************************
 * static implementation             *
 ************************************/
-static void Init()
+static int Init()
 {
 	if (WSAStartup(MAKEWORD(2, 2), &wsdata) != SUCCESS)
 	{
-		printf("\n\tERROR: Failed Initialising Winsock (%d)", WSAGetLastError());
-		return 1;
+		perror(">ERROR: Failed initialising Winsock.\n");
+		return FAIL;
 	}
+
+	run = true;
+	return SUCCESS;
 }
 
 static void GetUserArgument()
 {
-	//sscanf("%s", input);
-	//run = !strncmp(input, "quit", 5);
+	printf("nsclient>");
+	scanf("%s", input);
+	run = strncmp(input, "quit", 5);
+}
+
+static bool LegalInput()
+{
+	return true;
+	perror(">ERROR: BAD NAME");
 }
 
 
