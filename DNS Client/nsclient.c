@@ -51,6 +51,10 @@ int main(int argc, char* argv[])
 		{
 			dnsQuery(input, ip);
 		}
+		else
+		{
+			perror(">ERROR: Ban domain name.\n");
+		}
 
 		GetUserArgument();
 	}
@@ -84,8 +88,33 @@ static void GetUserArgument()
 
 static bool LegalInput()
 {
+	int length = strlen(input);
+
+    if (length < 2 || length > 63) 
+    {
+    	return false;
+    }
+
+    for (int i = 0; i < length; i++) 
+    {
+        char c = input[i];
+        if (((c > 'a') && (c < 'z')) || ((c > '0') && (c < '9')) || (c == '-') || (c == '.')) 
+        {
+            if (((i - 3) >= 0) && ((i + 1) < length)) 
+            {
+                if ((c == '-') && (input[i - 3] == '.') && (input[i + 1] == '-'))
+                {
+                    return false;
+                }
+            }
+        }
+		else
+		{
+			return false;
+		}
+    }
+
 	return true;
-	perror(">ERROR: BAD NAME");
 }
 
 
